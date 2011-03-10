@@ -7,7 +7,8 @@ application = webapp.WSGIApplication(
 		[('/users/', UserList),
 		 ('/user/.*', UserView),
 		 ('/clubs/', ClubList),
-		 ('/club/.*', ClubView)
+		 ('/club/edit/.*', ClubEdit),
+		 ('/club/.*', ClubView),
 		],
 		debug=True)
 
