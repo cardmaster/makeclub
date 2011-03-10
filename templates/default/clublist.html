@@ -4,5 +4,18 @@
 </head>
 <body>
 <h1>Club List</h1>
+{% for club in clubs %}
+<div class="clubLine">
+	<span class="name">
+		<a class="clubLink" href="{{ cluburl }}/{{ club.slug }}">{{ club.name }}</a>
+	</span>
+	<span class="clubFund">
+		{{ club.fund }}
+	</span>
+	<span class="clubIntro">
+		{{ club.intro }}
+	</span>
+</div>
+{% endfor %}
 </body>
 </html>
