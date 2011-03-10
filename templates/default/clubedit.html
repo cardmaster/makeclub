@@ -1,8 +1,23 @@
 <html>
-<head>
-<title>Club View</title>
-</head>
-<body>
-<h1>Club View</h1>
-</body>
+	<head>
+		<title>Club Edit</title>
+	</head>
+	<body>
+		<h1>FUCK THE VALUE {{ fuck }}</h1>
+		<h1>Club Edit by {{ username }}</h1>
+		<form id="club" method="post" action="{{ action }}">
+			<div class="clubKeyInputLine"><span class="inputName">Key :</span>
+				<input type="text" name="key" /> </div>
+			<div class="clubNameInputLine"><span class="inputName">Name: </span>
+				<input type="text" name="name" /> </div>
+			<div class="clubFundInputLine"><span class="inputName">Fund: </span>
+				<input type="text" name="fund" /> </div>
+			<div class="clubIntroInput"><span class="inputName">Introduction</span><br />
+				<textarea name="clubintro" class="clubIntroInput" /></textarea>
+			</div>
+			<div class="clubFundInputLine"><span class="inputName">I'm sure it's done: </span>
+				<input type="submit" />
+			</div>
+		</form>
+	</body>
 </html>
