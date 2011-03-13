@@ -3,5 +3,24 @@
 		<title>Club View</title>
 	</head>
 	<body>
+		<div id="pageContainer">
+		<div class="clubNameLine">
+		{{ club.name }}
+		</div>
+		<div class="clubIntroLine">
+		{{ club.intro }}
+		</div>
+		<div class="clubMembers">
+			<div class="clubMemebersHeader">
+			Members of Club {{ club.name }}
+			</div>
+			<div class="clubMemeberListArea">
+			<ul>
+			{% for member in members %}
+			   <li>{{ member }}</li>
+			{% endfor %}
+			</ul>
+			</div>
+		</div>
 	</body>
 </html>
