@@ -18,9 +18,14 @@
  
  
 '''
-from user import UserList
-from user import UserView
-from club import ClubList
-from club import ClubView
-from clubedit import ClubEdit
-from url import UrlConf
+from google.appengine.ext.webapp import template
+import os.path
+
+tplt = os.path.join(os.path.dirname(__file__), '../templates/default/errors.html')
+def renderErrorPage(msg, redirect=''):
+	vars = dict(msg=msg, redirect=redirect)
+	return template.render(tplt, vars)
+
+def errorPage(msg, redirect, response):
+	response.out.write (renderErrorPage(msg, redirect))
+	return False

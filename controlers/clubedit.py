@@ -23,7 +23,9 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp.util import run_wsgi_app
 from models import Club
+from url import urlconf
 import os
+from errors import errorPage
 
 class ClubEdit(webapp.RequestHandler):
 	def __init__(self, 
@@ -35,10 +37,9 @@ class ClubEdit(webapp.RequestHandler):
 	def accessControl(self):
 		user = users.get_current_user()
 		if user:
-			pass
+			return (True, user)
 		else:
-			self.redirect(users.create_login_url(self.request.uri))
-		return user
+			return (False, users.create_login_url(self.request.uri))
 
 	def responseClub(self, clubmodel, nickname):
 		templateValues = dict(action=self.request.path, username=nickname, model=clubmodel)
@@ -63,8 +64,11 @@ class ClubEdit(webapp.RequestHandler):
 		finally:
 			return slug
 
-	def get(self):
-		user = self.accessControl()
+	def get(self, *args):
+		stat, user = self.accessControl()
+		if (not stat):
+			return errorPage("Not Log in", user, self.response)
+			
 		if (self.clubmodel):
 			clubmd=self.clubmodel
 		else: 
@@ -72,7 +76,7 @@ class ClubEdit(webapp.RequestHandler):
 		self.responseClub (clubmd, user.nickname())
 
 	def parsePostdata(self, request, oldslug=''):
-		owner = request.get('owner', self.accessControl() )
+		owner = request.get('owner', users.get_current_user() )
 		if (not oldslug):
 			oldslug = request.get('oldslug', '')
 		slug = request.get('slug', '')
@@ -91,7 +95,7 @@ class ClubEdit(webapp.RequestHandler):
 		clubmd.intro = intro
 		return clubmd
 
-	def post(self): 
+	def post(self, *args): 
 		pathslug=self.analyzePath()
 		clubmd = self.parsePostdata (self.request, pathslug)
 		if (clubmd): #Put valid, then redirect
@@ -101,7 +105,7 @@ class ClubEdit(webapp.RequestHandler):
 		else:
 			self.get()
 
-	def put(self):
+	def put(self, *args):
 		self.response.set_status(404)
 		self.response.write ("Not supported put interface")
 

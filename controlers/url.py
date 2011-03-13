@@ -18,7 +18,31 @@
  
  
 '''
+
+def extPattern(base):
+    return base + '($|/.*)'
+
 cluburl = "/club"
 clubjoin = "/club/member"
 clubedit = "/club/edit"
 clublist = "/clubs"
+class UrlConf:
+    def clubViewPath(self, slug):
+        return cluburl + '/' + slug
+    
+    def clubListPath(self, cond = ''):
+        return clublist + '/' + cond
+    
+    def clubEditPath(self, slug):
+        return clubedit + '/' + slug
+    
+    def clubListPattern(self):
+        return extPattern(clublist)
+    
+    def clubViewPattern(self):
+        return cluburl + '/.*'
+    
+    def clubEditPattern(self):
+        return extPattern(clubedit)
+    
+urlconf = UrlConf()

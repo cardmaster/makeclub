@@ -30,7 +30,7 @@ class ClubList(webapp.RequestHandler):
 		webapp.RequestHandler.__init__(self, *args, **kw)
 		self.template = template
 
-	def get(self):
+	def get(self, *args):
 		clubs = Club.all()
 		cluburl = "/club"
 		self.response.out.write (template.render(self.template, locals()) )
@@ -41,6 +41,6 @@ class ClubView(webapp.RequestHandler):
 		webapp.RequestHandler.__init__(self, *args, **kw)
 		self.template = template
 
-	def get(self):
+	def get(self, *args):
 		self.response.out.write (template.render(self.template, locals()) )
 

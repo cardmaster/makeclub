@@ -23,19 +23,18 @@ from google.appengine.ext import webapp
 
 from google.appengine.ext.webapp.util import run_wsgi_app
 
-application = webapp.WSGIApplication(
-		[('/users/', UserList),
-		 ('/user/.*', UserView),
-		 ('/clubs/', ClubList),
-		 ('/club/edit/.*', ClubEdit),
-		 ('/club/.*', ClubView),
-		],
-		debug=True)
+urlconf = UrlConf()
+patlist = [('/users/.*', UserList),
+         ('/user/.*', UserView),
+         (urlconf.clubListPattern(), ClubList),
+         (urlconf.clubEditPattern(), ClubEdit),
+         (urlconf.clubViewPattern(), ClubView)
+        ]
+
+application = webapp.WSGIApplication( patlist, debug=True)
 
 def main():
-	run_wsgi_app(application)
+    run_wsgi_app(application)
 
 if __name__ == "__main__":
 	main()
-
-
