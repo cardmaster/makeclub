@@ -21,7 +21,10 @@
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp.util import run_wsgi_app
+from errors import errorPage
 from models import Club
+from helper import lastWordOfUrl
+from url import urlconf
 import os
 
 class ClubList(webapp.RequestHandler):
@@ -42,5 +45,14 @@ class ClubView(webapp.RequestHandler):
 		self.template = template
 
 	def get(self, *args):
-		self.response.out.write (template.render(self.template, locals()) )
+		path = self.request.path
+		slug = lastWordOfUrl(path)
+		if (slug):
+			club = Club.getClubBySlug(slug)
+		if (club):
+			self.response.out.write (template.render(self.template, locals()) )
+		else:
+			self.response.set_status(404)
+			errorPage("Club Not Found", urlconf.clubListPath(), self.response)
+			
 
