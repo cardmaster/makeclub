@@ -18,14 +18,20 @@
  
  
 '''
-from google.appengine.ext.webapp import template
-import os.path
-
-tplt = os.path.join(os.path.dirname(__file__), '../templates/default/errors.html')
-def renderErrorPage(msg, redirect=''):
-	vars = dict(message=msg, redirect=redirect)
-	return template.render(tplt, vars)
-
-def errorPage(msg, redirect, response):
-	response.out.write (renderErrorPage(msg, redirect))
-	return False
+from google.appengine.ext import db
+from decimal import Decimal
+class MoneyProperty(db.StringProperty):
+	data_type = Decimal
+	def __init__(self, *args, **kw):
+		db.StringProperty.__init__(self, multiline=False, *args, **kw)
+	def get_value_for_datastore(self, mi):
+		strv = db.StringProperty.get_value_for_datastore(self, mi)
+		return str(Decimal(strv))
+	def validate(self, value):
+		vv = Decimal(value)
+		return vv
+	def default_value(self):
+		return Decimal('0')
+	def make_value_from_datastore(self, value):
+		strv = db.StringProperty.make_value_from_datastore(self, value)
+		return Decimal(strv)

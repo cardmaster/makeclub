@@ -18,14 +18,9 @@
  
  
 '''
-from google.appengine.ext.webapp import template
-import os.path
 
-tplt = os.path.join(os.path.dirname(__file__), '../templates/default/errors.html')
-def renderErrorPage(msg, redirect=''):
-	vars = dict(message=msg, redirect=redirect)
-	return template.render(tplt, vars)
+def isAccessible (user, activity):
+	return True
 
-def errorPage(msg, redirect, response):
-	response.out.write (renderErrorPage(msg, redirect))
-	return False
+def hasClubPrivilige (user, club, activity):
+	return True

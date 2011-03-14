@@ -18,14 +18,13 @@
  
  
 '''
-from google.appengine.ext.webapp import template
-import os.path
+from google.appengine.ext import db
+from properties import MoneyProperty
+from club import Club
 
-tplt = os.path.join(os.path.dirname(__file__), '../templates/default/errors.html')
-def renderErrorPage(msg, redirect=''):
-	vars = dict(message=msg, redirect=redirect)
-	return template.render(tplt, vars)
-
-def errorPage(msg, redirect, response):
-	response.out.write (renderErrorPage(msg, redirect))
-	return False
+class Membership(db.Model):
+	user = db.UserProperty()
+	club = db.ReferenceProperty(Club)
+	name = db.StringProperty(multiline=False) #Name display in this club
+	balance = MoneyProperty()
+	mail = db.EMailProperty()

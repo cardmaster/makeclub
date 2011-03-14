@@ -18,14 +18,12 @@
  
  
 '''
-from google.appengine.ext.webapp import template
-import os.path
 
-tplt = os.path.join(os.path.dirname(__file__), '../templates/default/errors.html')
-def renderErrorPage(msg, redirect=''):
-	vars = dict(message=msg, redirect=redirect)
-	return template.render(tplt, vars)
-
-def errorPage(msg, redirect, response):
-	response.out.write (renderErrorPage(msg, redirect))
-	return False
+#Get the last WORDs after the last slash, if no slash in this string, return empty input arg
+def lastWordOfUrl(url):
+	slug = url
+	try:
+		slashIndex = slug.rindex('/')
+		return slug[slashIndex + 1:]
+	except:
+		return ''
