@@ -26,7 +26,8 @@ from models import Club
 from url import urlconf
 import os
 from errors import errorPage
-
+from access import hasClubPrivilige 
+from access import isAccessible
 class ClubEdit(webapp.RequestHandler):
 	def __init__(self, 
 			template=os.path.join(os.path.dirname(__file__), '../templates/default/clubedit.html'), *args, **kw ):
@@ -64,16 +65,25 @@ class ClubEdit(webapp.RequestHandler):
 		finally:
 			return slug
 
+	def editOrCreateRight(self, user, club):
+		if ( (club.is_saved() and isAccessible (user, "createClub"))  #Create
+				or (hasClubPrivilge(user, club, "edit")) ): #Edit
+			return True
+		else:
+			errorPage("Access Deny For club", users.create_login_url(self.request.uri), self.response)#Access Deny
+			return False
+
+
 	def get(self, *args):
 		stat, user = self.accessControl()
 		if (not stat):
 			return errorPage("Not Log in", user, self.response)
-			
 		if (self.clubmodel):
 			clubmd=self.clubmodel
 		else: 
 			clubmd = self.makeClubModel(self.analyzePath())
-		self.responseClub (clubmd, user.nickname())
+		if (self.editOrCreateRight(user, clubmd)):
+			self.responseClub (clubmd, user.nickname())
 
 	def parsePostdata(self, request, oldslug=''):
 		owner = request.get('owner', users.get_current_user() )
@@ -96,12 +106,16 @@ class ClubEdit(webapp.RequestHandler):
 		return clubmd
 
 	def post(self, *args): 
+		stat, user = self.accessControl()
 		pathslug=self.analyzePath()
 		clubmd = self.parsePostdata (self.request, pathslug)
 		if (clubmd): #Put valid, then redirect
-			self.clubmodel = clubmd
-			clubmd.put()
-			self.redirect ("/club/edit/" + clubmd.slug)
+			if ( self.editOrCreateRight(user, clubmd) ):
+				self.clubmodel = clubmd
+				clubmd.put()
+				self.redirect ("/club/edit/" + clubmd.slug)
+			else:
+				return
 		else:
 			self.get()
 

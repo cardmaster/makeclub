@@ -18,9 +18,25 @@
  
  
 '''
+from google.appengine.api import users
+
+activities = [
+	"listclubs",
+	"createClub"
+]
+
+clubActivities = [
+	"create",
+	"edit",
+	"delete",
+	"arrange",
+	"finish"
+]
 
 def isAccessible (user, activity):
 	return True
 
 def hasClubPrivilige (user, club, activity):
 	return True
+
+

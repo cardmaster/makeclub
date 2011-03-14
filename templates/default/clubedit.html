@@ -3,7 +3,7 @@
 		<title>Club Edit</title>
 	</head>
 	<body>
-		<h1>Club Edit by {{ username }}</h1>
+		<h1>Club edit by {{ username }} {%if lastmodi %} at {{ lastmodi }} {% endif %}</h1>
 		<form id="club" method="post" action="{{ action }}">
 			{% if oldslug %}
 				<input type="hidden" value="{{ oldslug }}" />
