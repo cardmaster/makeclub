@@ -22,6 +22,8 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp.util import run_wsgi_app
 from models import Club
+from access import isAccessible
+from access import hasClubPrivilige
 import os
 
 class ClubList(webapp.RequestHandler):
@@ -31,6 +33,7 @@ class ClubList(webapp.RequestHandler):
 		self.template = template
 
 	def get(self, *args):
+		if (isAccessible('', 'listclubs'));
 		clubs = Club.all()
 		cluburl = "/club"
 		self.response.out.write (template.render(self.template, locals()) )
