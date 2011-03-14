@@ -26,6 +26,7 @@ activities = [
 ]
 
 clubActivities = [
+	"view",
 	"create",
 	"edit",
 	"delete",
