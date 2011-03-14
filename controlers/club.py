@@ -24,6 +24,7 @@ from google.appengine.ext.webapp.util import run_wsgi_app
 from errors import errorPage
 from models import Club
 from helper import lastWordOfUrl
+from access import hasClubPrivilige
 from url import urlconf
 import os
 
@@ -38,6 +39,7 @@ class ClubList(webapp.RequestHandler):
 		cluburl = "/club"
 		self.response.out.write (template.render(self.template, locals()) )
 
+from google.appengine.api import users
 class ClubView(webapp.RequestHandler):
 	def __init__(self, 
 			template=os.path.join(os.path.dirname(__file__), '../templates/default/clubview.html'), *args, **kw ):
@@ -50,7 +52,14 @@ class ClubView(webapp.RequestHandler):
 		if (slug):
 			club = Club.getClubBySlug(slug)
 		if (club):
-			self.response.out.write (template.render(self.template, locals()) )
+			templatevars = dict(club = club )
+			user = users.get_current_user()
+			if (user and hasClubPrivilige(user, club, 'join')): #Could Join
+				templatevars['userName'] = user.nickname()
+				templatevars['userEmail'] = user.email()
+			else:
+				templatevars['loginUrl'] = users.create_login_url(self.request.uri)
+			self.response.out.write (template.render(self.template, templatevars) )
 		else:
 			self.response.set_status(404)
 			errorPage("Club Not Found", urlconf.clubListPath(), self.response)
