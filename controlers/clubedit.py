@@ -25,8 +25,7 @@ from models import Club
 from url import urlconf
 from template import render
 from errors import errorPage
-from access import hasClubPrivilige 
-from access import isAccessible
+from access import hasClubPrivilige, isAccessible
 class ClubEdit(webapp.RequestHandler):
 	def __init__(self, 
 			template='clubedit.html', *args, **kw ):

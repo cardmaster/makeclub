@@ -19,14 +19,12 @@
  
 '''
 from google.appengine.ext import webapp
-from template import render
-from errors import errorPage
 from models import Club
-from access import isAccessible
-from url import cluburl
+from access import hasClubPrivilige, isAccessible
 from helper import lastWordOfUrl
-from access import hasClubPrivilige
-from url import urlconf
+from url import cluburl, urlconf
+from errors import errorPage
+from template import render
 
 class ClubList(webapp.RequestHandler):
 	def __init__(self,
