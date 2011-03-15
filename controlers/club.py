@@ -56,6 +56,7 @@ class ClubView(webapp.RequestHandler):
 			templatevars = dict(club = club )
 			user = users.get_current_user()
 			if (user and hasClubPrivilige(user, club, 'join')): #Could Join
+				templatevars['action'] = urlconf.memberPath(club.slug, user.email())
 				templatevars['userName'] = user.nickname()
 				templatevars['userEmail'] = user.email()
 			else:

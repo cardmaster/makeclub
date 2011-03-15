@@ -12,7 +12,7 @@
 		</div>
 		<div class="applyClub">
 		{% if userName %}
-		<form name="applyClub">
+		<form name="applyClub" method="post" action="{{ action }}">
 		<div class="applyInfo">
 		<span class="inputPropmt namePrompt">Name In Club: </span><input type="text" name="name" text="{{ userName }}" />
 		<span class="inputPropmt namePrompt">Email In Club: </span><input type="text" name="email" text="{{ userEmail }}" />

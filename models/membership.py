@@ -27,7 +27,7 @@ class Membership(db.Model):
 	club = db.ReferenceProperty(Club)
 	name = db.StringProperty(multiline=False) #Name display in this club
 	balance = MoneyProperty()
-	mail = db.EmailProperty()
+	email = db.EmailProperty()
 	@staticmethod
 	def between(user, club):
 		q = Membership.all()

@@ -28,6 +28,7 @@ patlist = [('/users/.*', UserList),
          ('/user/.*', UserView),
          (urlconf.clubListPattern(), ClubList),
          (urlconf.clubEditPattern(), ClubEdit),
+         (urlconf.memberPattern(), Member),
          (urlconf.clubViewPattern(), ClubView)
         ]
 

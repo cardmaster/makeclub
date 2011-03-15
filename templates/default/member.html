@@ -6,13 +6,13 @@
 		<h1>Membership of Club {{ club.name }}</h1>
 		<form id="membership" method="post" action="{{ action }}">
 			<div class="clubKeyInputLine"><span class="inputName">Name:&nbsp; </span>
-				<input type="text" name="name" value="{{ member.nickname }}" /> </div>
+				<input type="text" name="name" value="{{ member.name }}" /> </div>
 			<div class="clubNameInputLine"><span class="inputName">Email: </span>
 				<input type="text" name="email" value="{{ member.email }}" /> </div>
 			<div class="clubFundInputLine"><span class="inputName">Balance: </span>
 				<input type="text" name="balance" value="{{ member.balance }}" /> </div>
 			<div class="clubIntroInput"><span class="inputName">Leave Message</span><br />
-				<textarea name="intro" class="clubIntroInput" >say something to {{ nickname }}</textarea>
+				<textarea name="intro" class="clubIntroInput" >say something to {{ member.name }}</textarea>
 			</div>
 			<div class="clubFundInputLine"><span class="inputName">I'm sure it's done: </span>
 				<input type="submit" value="OK, Update" />
