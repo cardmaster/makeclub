@@ -28,3 +28,12 @@ class Membership(db.Model):
 	name = db.StringProperty(multiline=False) #Name display in this club
 	balance = MoneyProperty()
 	mail = db.EmailProperty()
+	@staticmethod
+	def between(user, club):
+		q = Membership.all()
+		q.filter("user =", user)
+		q.filter("club =", club)
+		res = q.fetch(1)
+		for mem in res:
+			return mem
+		return None

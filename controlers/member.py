@@ -18,14 +18,33 @@
  
  
 '''
-from google.appengine.ext.webapp import template
-class ClubEdit(webapp.RequestHandler):
+from google.appengine.api import users
+from google.appengine.ext import webapp
+
+from models import Club, Membership
+
+from template import render
+from access import hasClubPrivilige
+from helper import lastWordOfUrl
+
+class Member(webapp.RequestHandler):
 	def __init__(self, 
-		template=os.path.join(os.path.dirname(__file__), '../templates/default/clubedit.html'), *args, **kw ):
+		template='member.html', *args, **kw ):
 		webapp.RequestHandler.__init__(self, *args, **kw)
+		self.template = template
 		
 	def post(self, *args):
-		pass
-	
+		self.response.write (render(self.template, locals()))
+		
 	def get(self, *args):
-		pass
+		user = users.get_current_user()
+		slug = lastWordOfUrl(self.request.path)
+		club = Club.getClubBySlug(slug)
+		if (not hasUserPrivilige(user, club, 'membership')):
+			return errorPage ("Can not access", '/', self.response, 403)
+		if (club):
+			member = Membership (name = user.nickname(), email = user.email(), club=club)
+			self.response.write (render(selflf.template, locals()))
+		else:
+			return errorPage ("No such club", '/', 404)
+			
