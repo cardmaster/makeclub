@@ -18,5 +18,14 @@
  
  
 '''
-from membership import Membership
-from club import Club
+from google.appengine.ext.webapp import template
+class ClubEdit(webapp.RequestHandler):
+	def __init__(self, 
+		template=os.path.join(os.path.dirname(__file__), '../templates/default/clubedit.html'), *args, **kw ):
+		webapp.RequestHandler.__init__(self, *args, **kw)
+		
+	def post(self, *args):
+		pass
+	
+	def get(self, *args):
+		pass
