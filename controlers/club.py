@@ -19,8 +19,7 @@
  
 '''
 from google.appengine.ext import webapp
-from google.appengine.ext.webapp import template
-from google.appengine.ext.webapp.util import run_wsgi_app
+from template import render
 from errors import errorPage
 from models import Club
 from access import isAccessible
@@ -28,11 +27,10 @@ from url import cluburl
 from helper import lastWordOfUrl
 from access import hasClubPrivilige
 from url import urlconf
-import os
 
 class ClubList(webapp.RequestHandler):
 	def __init__(self,
-			template=os.path.join(os.path.dirname(__file__), '../templates/default/clublist.html'), *args, **kw ):
+			template='clublist.html', *args, **kw ):
 		webapp.RequestHandler.__init__(self, *args, **kw)
 		self.template = template
 
@@ -40,14 +38,14 @@ class ClubList(webapp.RequestHandler):
 		if (isAccessible('', 'listclubs')):
 			clubs = Club.all()
 			vars = dict (clubs=Club.all(), cluburl=cluburl)
-			self.response.out.write (template.render(self.template, vars) )
+			self.response.out.write (render(self.template, vars) )
 		else:
 			errorPage("Not Accessible", users.create_login_url(self.request.uri), self.response)
 
 from google.appengine.api import users
 class ClubView(webapp.RequestHandler):
 	def __init__(self, 
-			template=os.path.join(os.path.dirname(__file__), '../templates/default/clubview.html'), *args, **kw ):
+			template='clubview.html', *args, **kw ):
 		webapp.RequestHandler.__init__(self, *args, **kw)
 		self.template = template
 
@@ -64,7 +62,7 @@ class ClubView(webapp.RequestHandler):
 				templatevars['userEmail'] = user.email()
 			else:
 				templatevars['loginUrl'] = users.create_login_url(self.request.uri)
-			self.response.out.write (template.render(self.template, templatevars) )
+			self.response.out.write (render(self.template, templatevars) )
 		else:
 			self.response.set_status(404)
 			errorPage("Club Not Found", urlconf.clubListPath(), self.response)
