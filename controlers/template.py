@@ -18,13 +18,16 @@
  
  
 '''
-from template import render
 
-tplt = 'errors.html'
-def renderErrorPage(msg, redirect=''):
-	vars = dict(message=msg, redirect=redirect)
-	return render(tplt, vars)
+from google.appengine.ext.webapp import template
+import os
 
-def errorPage(msg, redirect, response):
-	response.out.write (renderErrorPage(msg, redirect))
-	return False
+def templateFolder():
+	return (os.path.join(os.path.dirname(__file__), '../templates'))
+def templateSet():
+	return 'default'
+
+def render(tempname, dict):
+	templateFile = os.path.join (templateFolder(), templateSet(), tempname)
+	return template.render(templateFile, dict)
+	
