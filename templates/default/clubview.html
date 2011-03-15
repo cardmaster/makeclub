@@ -10,6 +10,19 @@
 		<div class="clubIntroLine">
 		{{ club.intro }}
 		</div>
+		<div class="applyClub">
+		{% if userName %}
+		<form name="applyClub">
+		<div class="applyInfo">
+		<span class="inputPropmt namePrompt">Name In Club: </span><input type="text" name="name" text="{{ userName }}" />
+		<span class="inputPropmt namePrompt">Email In Club: </span><input type="text" name="email" text="{{ userEmail }}" />
+		</div>
+		<input class="submit" type="submit" value="Join This Club" />
+		</form>
+		{% else %}
+		Please <a alt="click to login" href="{{ loginUrl }}">log in</a> before join this club.
+		{% endif %}
+		</div>
 		<div class="clubMembers">
 			<div class="clubMemebersHeader">
 			Members of Club {{ club.name }}
@@ -17,7 +30,7 @@
 			<div class="clubMemeberListArea">
 			<ul>
 			{% for member in members %}
-			   <li>{{ member }}</li>
+			   <li>{{ member.name }}</li>
 			{% endfor %}
 			</ul>
 			</div>
