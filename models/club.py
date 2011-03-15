@@ -38,7 +38,7 @@ class Club(db.Model):
 
 	@staticmethod
 	def getClub(slug):
-		ret = getClubBySlug(slug)
+		ret = Club.getClubBySlug(slug)
 		if (ret):
 			return ret
 		else:

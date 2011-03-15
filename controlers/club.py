@@ -37,10 +37,12 @@ class ClubList(webapp.RequestHandler):
 		self.template = template
 
 	def get(self, *args):
-		if (isAccessible('', 'listclubs'));
-		clubs = Club.all()
-		vars = dict (clubs=Club.all(), cluburl=cluburl)
-		self.response.out.write (template.render(self.template, locals()) )
+		if (isAccessible('', 'listclubs')):
+			clubs = Club.all()
+			vars = dict (clubs=Club.all(), cluburl=cluburl)
+			self.response.out.write (template.render(self.template, vars) )
+		else:
+			errorPage("Not Accessible", users.create_login_url(self.request.uri), self.response)
 
 from google.appengine.api import users
 class ClubView(webapp.RequestHandler):

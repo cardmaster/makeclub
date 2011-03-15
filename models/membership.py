@@ -27,4 +27,4 @@ class Membership(db.Model):
 	club = db.ReferenceProperty(Club)
 	name = db.StringProperty(multiline=False) #Name display in this club
 	balance = MoneyProperty()
-	mail = db.EMailProperty()
+	mail = db.EmailProperty()
