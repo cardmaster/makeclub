@@ -20,16 +20,16 @@
 '''
 from google.appengine.api import users
 from google.appengine.ext import webapp
-from google.appengine.ext.webapp import template
+
 from models import Club
 from url import urlconf
-import os
+from template import render
 from errors import errorPage
 from access import hasClubPrivilige 
 from access import isAccessible
 class ClubEdit(webapp.RequestHandler):
 	def __init__(self, 
-			template=os.path.join(os.path.dirname(__file__), '../templates/default/clubedit.html'), *args, **kw ):
+			template='clubedit.html', *args, **kw ):
 		webapp.RequestHandler.__init__(self, *args, **kw)
 		self.clubmodel = None
 		self.template = template
@@ -45,7 +45,7 @@ class ClubEdit(webapp.RequestHandler):
 		templateValues = dict(action=self.request.path, username=nickname, model=clubmodel)
 		if (clubmodel.is_saved()):
 			templateValues['oldslug'] = clubmodel.slug
-		self.response.out.write (template.render(self.template, templateValues) )
+		self.response.out.write (render(self.template, templateValues) )
 
 	def makeClubModel(self, slug=''):
 		if (not slug):
