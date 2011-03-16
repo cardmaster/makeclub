@@ -52,6 +52,48 @@ class Member(webapp.RequestHandler):
 		self.member = None
 		self.targetUser = None
 		self.postStatus = ''
+'''	
+Every response method will call visit() first, this will load user(operator),
+targetUser(Target), and club(Target Club) from the request path,
+if no targetUser specified, we'll assume current user as target user
+than create a membership between club and targetUser
+'''
+
+	def post(self, *args):
+		if (self.visit()): 
+			#If find 'delete' in the request data, we'll delete the member specify by the path
+			if (self.judgeDelete()):
+				self.doDelete()
+				errorPage("Delete Succeed", urlconf.clubViewPath(self.club.slug), self.response, 200)
+				return True
+			#Esle we'll construct membership object via postdata
+			member = self.getPostData()
+			if (member.put()):
+				self.postStatus = "Succeed"
+			self.member = member
+			self.get(*args)
+			
+	#Delete method not supported yet
+	def delete(self, *args):
+		if (self.visit()):
+			if (self.member):
+				member = self.member
+				member.delete()
+				self.member = None
+		self.response.write("Succeed!")
+			
+	#Get method will display the edit form
+	def get(self, *args):
+		if (self.visit()): 
+			club = self.club
+			tempvars = dict (user = self.user,
+						action = urlconf.memberPath(self.club.slug, self.user.email()),
+						member = self.getMember(),
+						club   = self.club,
+						cluburl= urlconf.clubViewPath(club.slug),
+						postStatus = self.postStatus
+			)
+		self.response.out.write (render(self.template, tempvars))
 	
 	def judgeDelete(self):
 		return (self.request.get('delete', '') == "True")
@@ -65,39 +107,6 @@ class Member(webapp.RequestHandler):
 	
 	def dbg(self, *args):
 		self.response.out.write(' '.join([str(arg) for arg in args]))
-	def post(self, *args):
-		if (self.visit()): 
-			if (self.judgeDelete()):
-				self.doDelete()
-				errorPage("Delete Succeed", urlconf.clubViewPath(self.club.slug), self.response, 200)
-				return True
-			member = self.getPostData()
-			self.dbg('user = ', member.user)
-			if (member.put()):
-				self.postStatus = "Succeed"
-			self.member = member
-			self.get(*args)
-			
-	def delete(self, *args):
-		self.dbg("goto hell")
-		if (self.visit()):
-			if (self.member):
-				member = self.member
-				member.delete()
-				self.member = None
-		self.response.write("Succeed!")
-			
-	def get(self, *args):
-		if (self.visit()): 
-			club = self.club
-			tempvars = dict (user = self.user,
-						action = urlconf.memberPath(self.club.slug, self.user.email()),
-						member = self.getMember(),
-						club   = self.club,
-						cluburl= urlconf.clubViewPath(club.slug),
-						postStatus = self.postStatus
-			)
-		self.response.out.write (render(self.template, tempvars))
 	
 	#Create user, club, and member_namebership information according to request path
 	def visit(self):
@@ -113,10 +122,11 @@ class Member(webapp.RequestHandler):
 			pathuser = users.User(pathuser)
 		else:
 			pathuser = user
-		if (not hasClubPrivilige(user, club, 'membership:' + pathuser.email())):
-			return errorPage ("Can not access", '/', self.response, 403)
 		if (not club):	
 			return errorPage ("No such club " + slug, '/', self.response, 404)
+		#@warning: I don't know is it correct to add access control code here
+		if (not hasClubPrivilige(user, club, 'membership:' + pathuser.email())):
+			return errorPage ("Can not access", '/', self.response, 403)
 		self.user = user
 		self.club = club
 		self.member = Membership.between(user, club)
@@ -155,3 +165,4 @@ class Member(webapp.RequestHandler):
 			if (not member):
 				member = Membership (name = user.nickname(), email = user.email(), club=self.club)
 		return member
+
