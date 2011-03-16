@@ -31,10 +31,7 @@ class Club(db.Model):
 	def getClubBySlug(slug):
 		q = Club.all()
 		q.filter("slug =", slug)
-		res = q.fetch(1)
-		for clb in res:
-			return clb
-		return None
+		return q.get()
 
 	@staticmethod
 	def getClub(slug):

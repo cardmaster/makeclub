@@ -42,6 +42,13 @@ def analyzePath(url, n=2):
 			if (i >= n): return tuple
 	return tuple
 	
+
+'''	
+Every response method will call visit() first, this will load user(operator),
+targetUser(Target), and club(Target Club) from the request path,
+if no targetUser specified, we'll assume current user as target user
+than create a membership between club and targetUser
+'''
 class Member(webapp.RequestHandler):
 	def __init__(self, 
 		template='member.html', *args, **kw ):
@@ -52,12 +59,6 @@ class Member(webapp.RequestHandler):
 		self.member = None
 		self.targetUser = None
 		self.postStatus = ''
-'''	
-Every response method will call visit() first, this will load user(operator),
-targetUser(Target), and club(Target Club) from the request path,
-if no targetUser specified, we'll assume current user as target user
-than create a membership between club and targetUser
-'''
 
 	def post(self, *args):
 		if (self.visit()): 
@@ -93,7 +94,7 @@ than create a membership between club and targetUser
 						cluburl= urlconf.clubViewPath(club.slug),
 						postStatus = self.postStatus
 			)
-		self.response.out.write (render(self.template, tempvars))
+			self.response.out.write (render(self.template, tempvars))
 	
 	def judgeDelete(self):
 		return (self.request.get('delete', '') == "True")
@@ -112,18 +113,23 @@ than create a membership between club and targetUser
 	def visit(self):
 		if (self.club and self.user):
 			return True
+		#Analyze req path first
 		slug, pathuser = analyzePath(self.request.path)
+		#Get club
+		club = Club.getClubBySlug(slug)
+		if (not club):	
+			return errorPage ("No such club " + slug, '/clubs', self.response, 404)
+	
+		#Check user status
 		user = users.get_current_user()
 		if (not user):
 			return errorPage ("User not login", users.create_login_url(self.request.uri), self.response, self.response, 403)
-		club = Club.getClubBySlug(slug)
+	
 		#That the one we modify is the path user. if omitted, user current user as target
 		if (pathuser):
 			pathuser = users.User(pathuser)
 		else:
 			pathuser = user
-		if (not club):	
-			return errorPage ("No such club " + slug, '/', self.response, 404)
 		#@warning: I don't know is it correct to add access control code here
 		if (not hasClubPrivilige(user, club, 'membership:' + pathuser.email())):
 			return errorPage ("Can not access", '/', self.response, 403)
