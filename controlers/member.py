@@ -28,6 +28,7 @@ from template import render
 from access import hasClubPrivilige
 from helper import lastWordOfUrl
 from errors import errorPage
+from urllib import unquote
 
 def analyzePath(url, n=2):
 	idx = url.rindex(memberurl)
@@ -36,7 +37,7 @@ def analyzePath(url, n=2):
 	i = 0
 	for part in url[st:].split('/'):
 		if (part):
-			tuple[i] = part
+			tuple[i] = unquote(part)
 			i += 1
 			if (i >= n): return tuple
 	return tuple
@@ -49,16 +50,43 @@ class Member(webapp.RequestHandler):
 		self.club = None
 		self.user = None
 		self.member = None
+		self.targetUser = None
 		self.postStatus = ''
-		
+	
+	def judgeDelete(self):
+		return (self.request.get('delete', '') == "True")
+	
+	def doDelete(self):
+		if (hasClubPrivilige(self.user, self.club, 'deleteMember:'+self.targetUser.email() )):
+			member = self.member
+			if (member):
+				return member.delete()
+		return False		
+	
+	def dbg(self, *args):
+		self.response.out.write(' '.join([str(arg) for arg in args]))
 	def post(self, *args):
 		if (self.visit()): 
+			if (self.judgeDelete()):
+				self.doDelete()
+				errorPage("Delete Succeed", urlconf.clubViewPath(self.club.slug), self.response, 200)
+				return True
 			member = self.getPostData()
+			self.dbg('user = ', member.user)
 			if (member.put()):
 				self.postStatus = "Succeed"
 			self.member = member
 			self.get(*args)
-	
+			
+	def delete(self, *args):
+		self.dbg("goto hell")
+		if (self.visit()):
+			if (self.member):
+				member = self.member
+				member.delete()
+				self.member = None
+		self.response.write("Succeed!")
+			
 	def get(self, *args):
 		if (self.visit()): 
 			club = self.club
@@ -92,21 +120,28 @@ class Member(webapp.RequestHandler):
 		self.user = user
 		self.club = club
 		self.member = Membership.between(user, club)
+		self.targetUser = pathuser
 		return True
 	
+	#Must call after self.visit
 	def getPostData(self):
 		member = self.getMember()
 		getval = self.request.get
-		if (getval('name', '')):
+		name = getval('name', '')
+		email = getval('email', '')
+		balance = getval('balance', '')
+		
+		member.user = self.targetUser
+		if (name):
 			member.name = getval('name', '')
-		else:
-			if (not member.name):
-				member.name = self.user.nickname()
-		if (getval('name', '')):
+		elif (not member.name):
+			member.name = self.user.nickname()
+		if (email):
 			member.email = getval('email', '')
-		else:
-			if (not member.email):
-				member.email = self.user.email()	
+		elif (not member.email):
+			member.email = self.user.email()	
+		if (balance):
+			member.balance = balance
 		return member
 		
 	#Could not launch if user is none
@@ -116,5 +151,7 @@ class Member(webapp.RequestHandler):
 		if (self.member):
 			member = self.member
 		else: 
-			member = Membership (name = user.nickname(), email = user.email(), club=self.club)
+			member = Membership.between (self.user, self.club)
+			if (not member):
+				member = Membership (name = user.nickname(), email = user.email(), club=self.club)
 		return member

@@ -28,12 +28,23 @@ class Membership(db.Model):
 	name = db.StringProperty(multiline=False) #Name display in this club
 	balance = MoneyProperty()
 	email = db.EmailProperty()
+	def copy(self, oth):
+		self.user = oth.user
+		self.club = oth.club
+		self.name = oth.name
+		self.balance = oth.balance
+		self.email = oth.email
 	@staticmethod
 	def between(user, club):
 		q = Membership.all()
-		q.filter("user =", user)
-		q.filter("club =", club)
-		res = q.fetch(1)
-		for mem in res:
-			return mem
-		return None
+		q.filter('user = ', user).filter('club = ', club)
+		return q.get()
+	
+	def put(self):
+		oldms = Membership.between(self.user, self.club)
+		entry = self
+		if (oldms):
+			oldms.copy(self)
+			entry = oldms
+		return db.Model.put (entry)
+		

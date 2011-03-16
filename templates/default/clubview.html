@@ -11,7 +11,13 @@
 		{{ club.intro }}
 		</div>
 		<div class="applyClub">
-		{% if userName %}
+		{% if membership %}
+		<div class="yourMembership">
+		You are member of this club (<a href="/member/{{ club.slug }}">{{membership.name}}</a>&lt;<a href="mailto:{{ membership.email }}">{{ membership.email }}</a>&gt;). 
+		balance: <span class="userbalance">{{ membership.balance }}</span>
+		</div>
+		{% else %}
+			{% if userName %}
 		<form name="applyClub" method="post" action="{{ action }}">
 		<div class="applyInfo">
 		<span class="inputPropmt namePrompt">Name In Club: </span><input type="text" name="name" text="{{ userName }}" />
@@ -19,8 +25,9 @@
 		</div>
 		<input class="submit" type="submit" value="Join This Club" />
 		</form>
-		{% else %}
+			{% else %}
 		Please <a alt="click to login" href="{{ loginUrl }}">log in</a> before join this club.
+			{% endif %}
 		{% endif %}
 		</div>
 		<div class="clubMembers">
@@ -30,7 +37,7 @@
 			<div class="clubMemeberListArea">
 			<ul>
 			{% for member in members %}
-			   <li>{{ member.name }}</li>
+			   <li>{{ meber.user }}, {{ member.name }}</li>
 			{% endfor %}
 			</ul>
 			</div>

@@ -9,5 +9,5 @@ if [ ! -d $LOG_FOLDER ]; then
 fi
 LOG_FILE=`date +%F.%H-%M-%S`.log
 echo Write log to file $LOG_FILE
-$DEV_SERVER -d $APP_FOLDER # 2>&1 >$LOG_FOLDER/$LOG_FILE 
+$DEV_SERVER $@ $APP_FOLDER # 2>&1 >$LOG_FOLDER/$LOG_FILE 
 echo Run server as PID $!

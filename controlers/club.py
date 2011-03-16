@@ -19,7 +19,7 @@
  
 '''
 from google.appengine.ext import webapp
-from models import Club
+from models import Club, Membership
 from access import hasClubPrivilige, isAccessible
 from helper import lastWordOfUrl
 from url import cluburl, urlconf
@@ -55,12 +55,18 @@ class ClubView(webapp.RequestHandler):
 		if (club):
 			templatevars = dict(club = club )
 			user = users.get_current_user()
-			if (user and hasClubPrivilige(user, club, 'join')): #Could Join
+			membership = Membership.between (user, club)
+			if (membership):
+				templatevars['membership'] = membership
+			elif (user and hasClubPrivilige(user, club, 'join')): #Could Join
 				templatevars['action'] = urlconf.memberPath(club.slug, user.email())
 				templatevars['userName'] = user.nickname()
 				templatevars['userEmail'] = user.email()
 			else:
 				templatevars['loginUrl'] = users.create_login_url(self.request.uri)
+			mq = Membership.all()
+			mq.filter ('club = ', club)
+			templatevars['members'] = mq
 			self.response.out.write (render(self.template, templatevars) )
 		else:
 			self.response.set_status(404)
