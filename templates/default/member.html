@@ -3,7 +3,10 @@
 		<title>Membership</title>
 	</head>
 	<body>
-		<h1>Membership of Club {{ club.name }}</h1>
+		{% if postStatus %}
+		<div class="postStatus">{{ postStatus }} saved membership between <a href="{{ cluburl }}">{{ club.name }}</a> and {{ member.name }}</div>
+		{% endif %}
+		<h1>Membership of Club <a href="{{ cluburl }}">{{ club.name }}</a></h1>
 		<form id="membership" method="post" action="{{ action }}">
 			<div class="clubKeyInputLine"><span class="inputName">Name:&nbsp; </span>
 				<input type="text" name="name" value="{{ member.name }}" /> </div>
