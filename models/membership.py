@@ -23,8 +23,8 @@ from properties import MoneyProperty
 from club import Club
 
 class Membership(db.Model):
-	user = db.UserProperty()
-	club = db.ReferenceProperty(Club)
+	user = db.UserProperty(required=True)
+	club = db.ReferenceProperty(Club, required=True)
 	name = db.StringProperty(multiline=False) #Name display in this club
 	balance = MoneyProperty()
 	email = db.EmailProperty()

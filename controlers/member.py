@@ -163,12 +163,12 @@ class Member(webapp.RequestHandler):
 	#Could not launch if user is none
 	def getMember(self, user=''):
 		if (not user):
-			user = self.user
+			user = self.targetUser
 		if (self.member):
 			member = self.member
 		else: 
-			member = Membership.between (self.user, self.club)
+			member = Membership.between (user, self.club)
 			if (not member):
-				member = Membership (name = user.nickname(), email = user.email(), club=self.club)
+				member = Membership (name = user.nickname(), email = user.email(), club=self.club, user = user)
 		return member
 
