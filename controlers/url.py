@@ -31,50 +31,47 @@ We use this rule:
 /activity/<slug>/<aid>/join	join an activity of a club(slug=<slug>, aid=<aid), if specify an 'targetUser'
 							field in request data, will cause this targetUser join this activity
 '''
-import re
 
+import re
+import os.path 
+pathjoin = os.path.join
 
 def extPattern(base):
 	return base + '($|/.*)'
-
-cluburl = "/club"
-clubjoin = "/club/member"
-clubedit = "/club/%s/edit"
-clublist = "/clubs"
-memberurl = "/member"
-class UrlConf:
-	def memberPath(self, slug='', user=''):
-		return (memberurl + '/' + slug + '/' + user)
-	
-	def memberPattern(self):
-		return extPattern(memberurl)
-	
-	def clubViewPath(self, slug):
-		return cluburl + '/' + slug
-	
-	def clubListPath(self, cond=''):
-		return clublist + '/' + cond
-	
-	def clubEditPath(self, slug):
-		return clubedit % slug
-	
-	def clubListPattern(self):
-		return extPattern(clublist)
-	
-	def clubViewPattern(self):
-		return cluburl + '/.*'
-	
-	def clubEditPattern(self):
-		return clubedit % '\S+' + '/?$' 
-	  
-	def getClubEditSlug(self, path):
-		reg = re.compile(clubedit % '(\S+)')
+class ModuleUrlConf(object):
+	@staticmethod
+	def generatePattern(base):
+		return (base % '(\S+)')
+	def __init__(self, base, pattern=''):#Base url must have a %s, to specify the variable part
+		self.base = base
+		if (not pattern):
+			self.pattern = ModuleUrlConf.generatePattern(base)
+		else:
+			self.pattern = pattern
+	def path(self, *args):
+		return self.base % args
+	def analyze(self, path):
+		reg = re.compile(self.pattern)
 		mat = reg.match (path)
 		if (mat):
 			try:
-				return mat.group(1)
+				return mat.groups()
 			except:
-				return ''
-		return ''
-		
-urlconf = UrlConf()
+				return []
+		else:
+			return []
+
+from helper import splitPath
+class MemberUrlConf(ModuleUrlConf):
+	def path(self, slug, user=''):
+		return ModuleUrlConf.path(self, slug, user)
+	def analyze(self, path):
+		result = splitPath(path, '/member', 2)
+		return result
+
+urldict = dict (
+	ClubList = ModuleUrlConf('/clubs', extPattern('/clubs') ),
+	ClubView = ModuleUrlConf('/club/%s', '/club/(\S+)/?$'),
+	ClubEdit = ModuleUrlConf('/club/%s/edit', '/club/(\S+)/edit/?$'),
+	Member   = MemberUrlConf('/member/%s/%s', '/member/.*')
+)

@@ -20,19 +20,14 @@
 '''
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
-
 from controlers import *
 
-urlconf = UrlConf()
-patlist = [('/users/.*', UserList),
-         ('/user/.*', UserView),
-         (urlconf.clubListPattern(), ClubList),
-         (urlconf.clubEditPattern(), ClubEdit),
-         (urlconf.memberPattern(), Member),
-         (urlconf.clubViewPattern(), ClubView)
-        ]
+def str_to_class(str):
+	return eval(str)
 
-application = webapp.WSGIApplication( patlist, debug=True)
+pathPatList = [(urldict[key].pattern, str_to_class(key)) for key in urldict]
+
+application = webapp.WSGIApplication( pathPatList, debug=True)
 
 def main():
     run_wsgi_app(application)

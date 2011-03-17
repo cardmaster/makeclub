@@ -22,15 +22,16 @@ from google.appengine.api import users
 from google.appengine.ext import webapp
 
 from models import Club
-from url import urlconf
 from template import render
 from errors import errorPage
 from access import hasClubPrivilige, isAccessible
 from helper import splitPath
+from url import urldict
 
 class ClubEdit(webapp.RequestHandler):
 	def __init__(self, 
 			template='clubedit.html', *args, **kw ):
+		self.urlconf = urldict['ClubEdit']
 		webapp.RequestHandler.__init__(self, *args, **kw)
 		self.clubmodel = None
 		self.template = template
@@ -57,7 +58,7 @@ class ClubEdit(webapp.RequestHandler):
 
 	def analyzePath(self):
 		path = self.request.path
-		slug = urlconf.getClubEditSlug(path)
+		slug, = self.urlconf.analyze(path)
 		return slug
 
 	def editOrCreateRight(self, user, club):
@@ -107,7 +108,7 @@ class ClubEdit(webapp.RequestHandler):
 			if ( self.editOrCreateRight(user, clubmd) ):
 				self.clubmodel = clubmd
 				clubmd.put()
-				self.redirect (urlconf.clubEditPath(clubmd.slug) )
+				self.redirect (self.urlconf.path(clubmd.slug) )
 			else:
 				return
 		else:

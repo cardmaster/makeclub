@@ -28,6 +28,7 @@ def lastWordOfUrl(url):
 	except:
 		return ''
 
+from urllib import unquote
 def splitPath(url, start='', n=2):
 	idx = url.rindex(start)
 	st = idx + len(start)
