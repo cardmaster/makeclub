@@ -31,7 +31,7 @@ from url import urldict
 class ClubEdit(webapp.RequestHandler):
 	def __init__(self, 
 			template='clubedit.html', *args, **kw ):
-		self.urlconf = urldict[self.__class__.__name__]
+		self.urlconf = urldict['ClubEdit']
 		webapp.RequestHandler.__init__(self, *args, **kw)
 		self.clubmodel = None
 		self.template = template
@@ -58,7 +58,7 @@ class ClubEdit(webapp.RequestHandler):
 
 	def analyzePath(self):
 		path = self.request.path
-		slug = self.urlconf.analyze(path)
+		slug, = self.urlconf.analyze(path)
 		return slug
 
 	def editOrCreateRight(self, user, club):

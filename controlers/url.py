@@ -55,7 +55,7 @@ class ModuleUrlConf(object):
 		mat = reg.match (path)
 		if (mat):
 			try:
-				return mat.groups()[1:]
+				return mat.groups()
 			except:
 				return []
 		else:
