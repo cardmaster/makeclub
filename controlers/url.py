@@ -31,17 +31,10 @@ We use this rule:
 /activity/<slug>/<aid>/join	join an activity of a club(slug=<slug>, aid=<aid), if specify an 'targetUser'
 							field in request data, will cause this targetUser join this activity
 '''
+
 import re
 import os.path 
 pathjoin = os.path.join
-
-
-cluburl = "/club"
-clubjoin = "/club/member"
-clubedit = "/club/%s/edit"
-clublist = "/clubs"
-memberurl = "/member"
-
 
 def extPattern(base):
 	return base + '($|/.*)'
@@ -77,45 +70,8 @@ class MemberUrlConf(ModuleUrlConf):
 		return result
 
 urldict = dict (
-	clublist = ModuleUrlConf('/clubs', extPattern('/clubs') ),
-	clubview = ModuleUrlConf('/club/%s', '/club/(\S+)/?$'),
-	clubedit = ModuleUrlConf('/club/%s/edit', '/club/(\S+)/edit/?$'),
-	member   = MemberUrlConf('/member/%s/%s', '/member/(\S+)/(\S+)')
+	ClubList = ModuleUrlConf('/clubs', extPattern('/clubs') ),
+	ClubView = ModuleUrlConf('/club/%s', '/club/(\S+)/?$'),
+	ClubEdit = ModuleUrlConf('/club/%s/edit', '/club/(\S+)/edit/?$'),
+	Member   = MemberUrlConf('/member/%s/%s', '/member/(\S+)/(\S+)')
 )
-
-class UrlConf:
-	def memberPath(self, slug='', user=''):
-		return (memberurl + '/' + slug + '/' + user)
-	
-	def memberPattern(self):
-		return extPattern(memberurl)
-	
-	def clubViewPath(self, slug):
-		return cluburl + '/' + slug
-	
-	def clubListPath(self, cond=''):
-		return clublist + '/' + cond
-	
-	def clubEditPath(self, slug):
-		return clubedit % slug
-	
-	def clubListPattern(self):
-		return extPattern(clublist)
-	
-	def clubViewPattern(self):
-		return cluburl + '/.*'
-	
-	def clubEditPattern(self):
-		return clubedit % '\S+' + '/?$' 
-	  
-	def getClubEditSlug(self, path):
-		reg = re.compile(clubedit % '(\S+)')
-		mat = reg.match (path)
-		if (mat):
-			try:
-				return mat.group(1)
-			except:
-				return ''
-		return ''
-		
-urlconf = UrlConf()
