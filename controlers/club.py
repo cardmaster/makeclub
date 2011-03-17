@@ -39,7 +39,7 @@ class ClubList(webapp.RequestHandler):
 	def get(self, *args):
 		if (isAccessible('', 'listclubs')):
 			clubs = Club.all()
-			vars = dict (clubs=Club.all(), cluburl=viewurlconf.path(''))
+			vars = dict (clubs=Club.all(), cluburl=viewurlconf.path('')[:-1])
 			self.response.out.write (render(self.template, vars) )
 		else:
 			errorPage("Not Accessible", users.create_login_url(self.request.uri), self.response)
