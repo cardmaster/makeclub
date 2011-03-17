@@ -31,6 +31,8 @@ We use this rule:
 /activity/<slug>/<aid>/join	join an activity of a club(slug=<slug>, aid=<aid), if specify an 'targetUser'
 							field in request data, will cause this targetUser join this activity
 '''
+import re
+
 
 def extPattern(base):
 	return base + '($|/.*)'
@@ -54,7 +56,7 @@ class UrlConf:
 		return clublist + '/' + cond
 	
 	def clubEditPath(self, slug):
-		return clubedit + '/' + slug
+		return clubedit % slug
 	
 	def clubListPattern(self):
 		return extPattern(clublist)
@@ -63,7 +65,16 @@ class UrlConf:
 		return cluburl + '/.*'
 	
 	def clubEditPattern(self):
-		return '/club/\S+/edit$'
+		return clubedit % '\S+' + '/?$' 
 	  
-	
+	def getClubEditSlug(self, path):
+		reg = re.compile(clubedit % '(\S+)')
+		mat = reg.match (path)
+		if (mat):
+			try:
+				return mat.group(1)
+			except:
+				return ''
+		return ''
+		
 urlconf = UrlConf()

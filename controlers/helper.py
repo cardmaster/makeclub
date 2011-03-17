@@ -27,3 +27,16 @@ def lastWordOfUrl(url):
 		return slug[slashIndex + 1:]
 	except:
 		return ''
+
+def splitPath(url, start='', n=2):
+	idx = url.rindex(start)
+	st = idx + len(start)
+	ary = [''] * n
+	i = 0
+	for part in url[st:].split('/'):
+		if (part):
+			ary[i] = unquote(part)
+			i += 1
+			if (i >= n): return ary
+	return ary
+

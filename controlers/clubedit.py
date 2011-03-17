@@ -26,6 +26,8 @@ from url import urlconf
 from template import render
 from errors import errorPage
 from access import hasClubPrivilige, isAccessible
+from helper import splitPath
+
 class ClubEdit(webapp.RequestHandler):
 	def __init__(self, 
 			template='clubedit.html', *args, **kw ):
@@ -55,13 +57,8 @@ class ClubEdit(webapp.RequestHandler):
 
 	def analyzePath(self):
 		path = self.request.path
-		try:
-			slashIndex = path.rindex('/')
-			slug = path[slashIndex + 1:]
-		except:
-			slug = ''
-		finally:
-			return slug
+		slug = urlconf.getClubEditSlug(path)
+		return slug
 
 	def editOrCreateRight(self, user, club):
 		if ( (club.is_saved() and isAccessible (user, "createClub"))  #Create
@@ -110,7 +107,7 @@ class ClubEdit(webapp.RequestHandler):
 			if ( self.editOrCreateRight(user, clubmd) ):
 				self.clubmodel = clubmd
 				clubmd.put()
-				self.redirect ("/club/edit/" + clubmd.slug)
+				self.redirect (urlconf.clubEditPath(clubmd.slug) )
 			else:
 				return
 		else:
@@ -119,4 +116,3 @@ class ClubEdit(webapp.RequestHandler):
 	def put(self, *args):
 		self.response.set_status(404)
 		self.response.write ("Not supported put interface")
-
