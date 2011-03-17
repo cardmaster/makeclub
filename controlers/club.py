@@ -22,10 +22,14 @@ from google.appengine.ext import webapp
 from models import Club, Membership
 from access import hasClubPrivilige, isAccessible
 from helper import lastWordOfUrl
-from url import cluburl, urlconf
+from url import urldict
 from errors import errorPage
 from template import render
 
+editurlconf = urldict['ClubEdit']
+listurlconf = urldict['ClubList']
+viewurlconf = urldict['ClubView']
+memberurlconf = urldict['Member']
 class ClubList(webapp.RequestHandler):
 	def __init__(self,
 			template='clublist.html', *args, **kw ):
@@ -35,7 +39,7 @@ class ClubList(webapp.RequestHandler):
 	def get(self, *args):
 		if (isAccessible('', 'listclubs')):
 			clubs = Club.all()
-			vars = dict (clubs=Club.all(), cluburl=cluburl)
+			vars = dict (clubs=Club.all(), cluburl=viewurlconf.path(''))
 			self.response.out.write (render(self.template, vars) )
 		else:
 			errorPage("Not Accessible", users.create_login_url(self.request.uri), self.response)
@@ -59,7 +63,7 @@ class ClubView(webapp.RequestHandler):
 			if (membership):
 				templatevars['membership'] = membership
 			elif (user and hasClubPrivilige(user, club, 'join')): #Could Join
-				templatevars['action'] = urlconf.memberPath(club.slug, user.email())
+				templatevars['action'] = memberurlconf.path(club.slug, user.email())
 				templatevars['userName'] = user.nickname()
 				templatevars['userEmail'] = user.email()
 			else:
@@ -70,6 +74,6 @@ class ClubView(webapp.RequestHandler):
 			self.response.out.write (render(self.template, templatevars) )
 		else:
 			self.response.set_status(404)
-			errorPage("Club Not Found", urlconf.clubListPath(), self.response)
+			errorPage("Club Not Found", listurlconf.path(), self.response)
 			
 

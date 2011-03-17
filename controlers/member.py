@@ -22,7 +22,7 @@ from google.appengine.api import users
 from google.appengine.ext import webapp
 
 from models import Club, Membership
-from url import memberurl, urlconf
+from url import urldict
 
 from template import render
 from access import hasClubPrivilige
@@ -30,25 +30,14 @@ from helper import lastWordOfUrl
 from errors import errorPage
 from urllib import unquote
 
-def analyzePath(url, n=2):
-	idx = url.rindex(memberurl)
-	st = idx + len(memberurl)
-	tuple = [''] * n
-	i = 0
-	for part in url[st:].split('/'):
-		if (part):
-			tuple[i] = unquote(part)
-			i += 1
-			if (i >= n): return tuple
-	return tuple
-	
-
 '''	
 Every response method will call visit() first, this will load user(operator),
 targetUser(Target), and club(Target Club) from the request path,
 if no targetUser specified, we'll assume current user as target user
 than create a membership between club and targetUser
 '''
+urlconf = urldict['Member']
+cvurlconf = urldict['ClubView']
 class Member(webapp.RequestHandler):
 	def __init__(self, 
 		template='member.html', *args, **kw ):
@@ -65,7 +54,7 @@ class Member(webapp.RequestHandler):
 			#If find 'delete' in the request data, we'll delete the member specify by the path
 			if (self.judgeDelete()):
 				self.doDelete()
-				errorPage("Delete Succeed", urlconf.clubViewPath(self.club.slug), self.response, 200)
+				errorPage("Delete Succeed", urldict['ClubView'].path(self.club.slug), self.response, 200)
 				return True
 			#Esle we'll construct membership object via postdata
 			member = self.getPostData()
@@ -88,10 +77,10 @@ class Member(webapp.RequestHandler):
 		if (self.visit()): 
 			club = self.club
 			tempvars = dict (user = self.user,
-						action = urlconf.memberPath(self.club.slug, self.user.email()),
+						action = urlconf.path(self.club.slug, self.user.email()),
 						member = self.getMember(),
 						club   = self.club,
-						cluburl= urlconf.clubViewPath(club.slug),
+						cluburl= cvurlconf.path(club.slug),
 						postStatus = self.postStatus
 			)
 			self.response.out.write (render(self.template, tempvars))
@@ -114,7 +103,7 @@ class Member(webapp.RequestHandler):
 		if (self.club and self.user):
 			return True
 		#Analyze req path first
-		slug, pathuser = analyzePath(self.request.path)
+		slug, pathuser = urlconf.analyze(self.request.path)
 		#Get club
 		club = Club.getClubBySlug(slug)
 		if (not club):	

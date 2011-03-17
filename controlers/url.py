@@ -38,7 +38,7 @@ pathjoin = os.path.join
 
 def extPattern(base):
 	return base + '($|/.*)'
-class ModuleUrlConf:
+class ModuleUrlConf(object):
 	@staticmethod
 	def generatePattern(base):
 		return (base % '(\S+)')
@@ -49,7 +49,7 @@ class ModuleUrlConf:
 		else:
 			self.pattern = pattern
 	def path(self, *args):
-		return base % args
+		return self.base % args
 	def analyze(self, path):
 		reg = re.compile(self.pattern)
 		mat = reg.match (path)

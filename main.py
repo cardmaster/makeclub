@@ -22,7 +22,10 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 from controlers import *
 
-pathPatList = [(urldict[key].pattern(), urldict) for key in urldict]
+def str_to_class(str):
+	return eval(str)
+
+pathPatList = [(urldict[key].pattern, str_to_class(key)) for key in urldict]
 
 application = webapp.WSGIApplication( pathPatList, debug=True)
 
