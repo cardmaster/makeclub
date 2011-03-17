@@ -18,13 +18,26 @@
  
  
 '''
+'''
+We use this rule:
+/clubs -> 				list clubs, or give more search query
+/club/<slug> 			display one club(slug=<slug>), if not exists, return 404
+/club/<slug>/edit		edit club with slubg=<slug>, if not exists, create one
+/club/<slug>/delete		delete club with slubg=<slug>, if not exists, create one
+/member/<slug>[/<user>]	edit membership of club(slug=<slug>), user=<user>(current_user if omitted),
+						when post data to a non-exits membership, will cause a create.
+/activity/<slug>/<aid>	display activity of a club(slug=<slug>, aid=<aid)
+/activity/<slug>/<aid>/edit	edit activity of a club(slug=<slug>, aid=<aid)
+/activity/<slug>/<aid>/join	join an activity of a club(slug=<slug>, aid=<aid), if specify an 'targetUser'
+							field in request data, will cause this targetUser join this activity
+'''
 
 def extPattern(base):
 	return base + '($|/.*)'
 
 cluburl = "/club"
 clubjoin = "/club/member"
-clubedit = "/club/edit"
+clubedit = "/club/%s/edit"
 clublist = "/clubs"
 memberurl = "/member"
 class UrlConf:
@@ -50,7 +63,7 @@ class UrlConf:
 		return cluburl + '/.*'
 	
 	def clubEditPattern(self):
-		return extPattern(clubedit)
+		return '/club/\S+/edit$'
 	  
 	
 urlconf = UrlConf()
