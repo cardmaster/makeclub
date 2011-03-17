@@ -28,7 +28,6 @@ from template import render
 from access import hasClubPrivilige
 from helper import lastWordOfUrl
 from errors import errorPage
-from urllib import unquote
 
 '''	
 Every response method will call visit() first, this will load user(operator),
