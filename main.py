@@ -30,7 +30,7 @@ pathPatList = [(urldict[key].pattern, str_to_class(key)) for key in urldict]
 application = webapp.WSGIApplication( pathPatList, debug=True)
 
 def main():
-    run_wsgi_app(application)
+	run_wsgi_app(application)
 
 if __name__ == "__main__":
 	main()

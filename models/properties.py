@@ -35,3 +35,47 @@ class MoneyProperty(db.StringProperty):
 	def make_value_from_datastore(self, value):
 		strv = db.StringProperty.make_value_from_datastore(self, value)
 		return Decimal(strv)
+
+class BillProperty(db.StringListProperty):
+	data_type = list
+	def __init__(self, *args, **kw):
+		db.StringListProperty.__init__(self,  *args, **kw)
+		self.tuplist = []
+		
+	def get_value_for_datastore(self, mi):
+		#tuplist = self.tuplist
+		storlist = db.StringListProperty.get_value_for_datastore(self, mi)
+		return storlist
+	
+	def serializeTuplist(self, tuplist):
+		storlist = []
+		for tup in tuplist:
+			storlist.append(str(tup[0]))
+			storlist.append(str(tup[1]))
+		return storlist
+		
+	#Actually, this validate function will do the conversion work.
+	def validate(self, value):
+		if (value == self.tuplist):
+			return value
+		else: 
+			return self.serializeTuplist(value)
+		
+	def default_value(self):
+		return []
+	
+	def make_value_from_datastore(self, value):
+		strlist = super(BillProperty, self).make_value_from_datastore(value)
+		i = 0
+		key = ''
+		output = []
+		for str in strlist:
+			if (i % 2 == 1):
+				output.append( (key, Decimal(str)) )
+			else: 
+				key = str
+			i += 1
+		self.tuplist = output
+		return output
+	
+	

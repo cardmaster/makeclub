@@ -18,11 +18,31 @@
  
  
 '''
-from user import UserList
-from user import UserView
-from club import ClubList
-from club import ClubView
-from clubedit import ClubEdit
-from url import urldict
-from member import Member
-from test import Test
+from google.appengine.ext import db
+from properties import MoneyProperty, BillProperty
+from club import Club
+
+class Activity(db.Model):
+	organizer = db.UserProperty()
+	club = db.ReferenceProperty(Club)
+	expense = MoneyProperty()
+	bill = BillProperty()
+	
+	def calcExpanse(self):
+		return self.expanse
+	
+	def copy(self, oth):
+		self.organizer = oth.organizer
+		self.club = oth.club
+		self.bill = oth.bill
+		self.expense = oth.expanse
+		
+	@staticmethod
+	def between(user, club):
+		q = Membership.all()
+		q.filter('user = ', user).filter('club = ', club)
+		return q.get()
+	
+#	def put(self):
+#		return db.Model.put (self)
+		
