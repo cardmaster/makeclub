@@ -44,7 +44,7 @@ class Test(webapp.RequestHandler):
 			output ("Cleaning up done")
 			return
 		output("Now let's go")
-		billList = [('Cort', '75'), ('Balls', '25')]
+		billList = [('Cort', '75.5'), ('Balls', '15')]
 		output ("BillList: ", billList)
 		
 		allacts = Activity.all()

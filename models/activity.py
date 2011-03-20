@@ -35,6 +35,9 @@ class Activity(db.Model):
 	duration = db.FloatProperty #Unit is hours
 	expense = MoneyProperty()
 	bill = BillProperty()
+	def __init__(self, *args, **kw):
+		super(Activity, self).__init__(*args, **kw)
+		self.expense = self.calcExpense()
 	
 	def calcExpense(self):
 		bill = self.bill

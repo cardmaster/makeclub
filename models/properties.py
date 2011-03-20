@@ -45,9 +45,7 @@ class BillProperty(db.StringListProperty):
 	
 	def get_value_for_datastore(self, mi):
 		#tuplist = self.tuplist
-		print "GV FOR DS, tupl = ", self.tuplist
 		serl = self.serializeTuplist(self.tuplist)
-		print "Seril: ", serl
 		return serl
 	
 	def serializeTuplist(self, tuplist):
@@ -75,7 +73,6 @@ class BillProperty(db.StringListProperty):
 		
 	#Actually, this validate function will do the conversion work.
 	def validate(self, value):
-		print "Validate", value
 		tupl = self.toTupleList(value)
 		self. tuplist = tupl
 		return tupl
