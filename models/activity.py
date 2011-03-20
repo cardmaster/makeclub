@@ -20,7 +20,7 @@
 '''
 from google.appengine.ext import db
 from properties import MoneyProperty, BillProperty
-from club import Club
+from models import Club, Membership
 from decimal import Decimal
 
 """
@@ -28,11 +28,11 @@ The reason we seperate date&time is mainly for index the data, so we could use m
 filters in the contoler
 """
 class Activity(db.Model):
-	organizer = db.UserProperty()
-	club = db.ReferenceProperty(Club)
+	organizer = db.UserProperty(required = True)
+	club = db.ReferenceProperty(Club, required = True)
 	date = db.DateProperty(indexed=True, auto_now=True, required=True)
 	time = db.TimeProperty(auto_now=True, required=True)
-	duration = db.FloatProperty #Unit is hours
+	duration = db.FloatProperty() #Unit is hours
 	expense = MoneyProperty()
 	bill = BillProperty()
 	def __init__(self, *args, **kw):
