@@ -23,14 +23,15 @@ from models import Activity, Membership
 class Test(webapp.RequestHandler):
 	def __init__(self, *args, **kw):
 		webapp.RequestHandler.__init__(self, *args, **kw)
-	def dbg(self, lb = True, *args):
+	def dbg(self, *args, **kw):
 		self.response.out.write( (' '.join([str(arg) for arg in args])) )
+		lb = kw.get('lb', True)
 		if (lb):
 			self.response.out.write( "<br />\n" )
 	def cleanUp(self):
 		allacts = Activity.all(keys_only=True)
 		for act in allacts:
-			self.dbg ("delete", act)
+			self.dbg ("Delete ", act)
 			db.delete(act)
 	def get(self, *args):
 		respo = self.response.out.write
@@ -50,13 +51,15 @@ class Test(webapp.RequestHandler):
 		for act in allacts:
 			bill = act.bill
 			for entry in bill:
-				output (False, "Entry:", entry, ",")
+				output ("Entry:", entry, ",", lb = False)
 			output()
-			output ("acts :", act.key(), " Expanse Bill: ", bill)
+			output ("acts:", act.key(), "Total Expense:", act.expense, "Expanse Bill: ", bill)
 		
 		mem = Membership.all().get()
+		output ("New activity")
 		act = Activity(organizer = mem.user, club = mem.club, bill = billList, expense = '100' )
-		output ("Expense: ", act.expense)
+		output ("Expense:", act.expense)
+		output ("Bill:", act.bill)
 		output ("Now, put")
 		key = act.put()
 		output ("Act Saved: ", act.is_saved(), "Key is ", key)

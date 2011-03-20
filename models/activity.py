@@ -21,28 +21,30 @@
 from google.appengine.ext import db
 from properties import MoneyProperty, BillProperty
 from club import Club
+from decimal import Decimal
 
+"""
+The reason we seperate date&time is mainly for index the data, so we could use more =
+filters in the contoler
+"""
 class Activity(db.Model):
 	organizer = db.UserProperty()
 	club = db.ReferenceProperty(Club)
+	date = db.DateProperty(indexed=True, auto_now=True, required=True)
+	time = db.TimeProperty(auto_now=True, required=True)
+	duration = db.FloatProperty #Unit is hours
 	expense = MoneyProperty()
 	bill = BillProperty()
 	
-	def calcExpanse(self):
-		return self.expanse
-	
-	def copy(self, oth):
-		self.organizer = oth.organizer
-		self.club = oth.club
-		self.bill = oth.bill
-		self.expense = oth.expanse
+	def calcExpense(self):
+		bill = self.bill
+		expense = Decimal('0')
+		for entry in bill:
+			name, exp = entry
+			expense += Decimal(exp)
+		return expense
 		
-	@staticmethod
-	def between(user, club):
-		q = Membership.all()
-		q.filter('user = ', user).filter('club = ', club)
-		return q.get()
+	def put(self):
+		self.expense = self.calcExpense()
+		return db.Model.put (self)
 	
-#	def put(self):
-#		return db.Model.put (self)
-		

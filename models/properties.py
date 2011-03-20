@@ -38,14 +38,17 @@ class MoneyProperty(db.StringProperty):
 
 class BillProperty(db.StringListProperty):
 	data_type = list
+	
 	def __init__(self, *args, **kw):
 		db.StringListProperty.__init__(self,  *args, **kw)
 		self.tuplist = []
-		
+	
 	def get_value_for_datastore(self, mi):
 		#tuplist = self.tuplist
-		storlist = db.StringListProperty.get_value_for_datastore(self, mi)
-		return storlist
+		print "GV FOR DS, tupl = ", self.tuplist
+		serl = self.serializeTuplist(self.tuplist)
+		print "Seril: ", serl
+		return serl
 	
 	def serializeTuplist(self, tuplist):
 		storlist = []
@@ -53,28 +56,37 @@ class BillProperty(db.StringListProperty):
 			storlist.append(str(tup[0]))
 			storlist.append(str(tup[1]))
 		return storlist
+	
+	def toTupleList(self, plainlist):
+		i = -1
+		key = ''
+		output = []
+		for str in plainlist:
+			i += 1
+			if (isinstance(str, tuple)): output.append(str)
+			if (i % 2 == 1):
+				try:
+					output.append( (key, Decimal(str)) )
+				except:
+					continue
+			else: 
+				key = str
+		return output
 		
 	#Actually, this validate function will do the conversion work.
 	def validate(self, value):
-		if (value == self.tuplist):
-			return value
-		else: 
-			return self.serializeTuplist(value)
+		print "Validate", value
+		tupl = self.toTupleList(value)
+		self. tuplist = tupl
+		return tupl
+
 		
 	def default_value(self):
 		return []
 	
 	def make_value_from_datastore(self, value):
 		strlist = super(BillProperty, self).make_value_from_datastore(value)
-		i = 0
-		key = ''
-		output = []
-		for str in strlist:
-			if (i % 2 == 1):
-				output.append( (key, Decimal(str)) )
-			else: 
-				key = str
-			i += 1
+		output = self.toTupleList(strlist)
 		self.tuplist = output
 		return output
 	
