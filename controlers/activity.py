@@ -15,14 +15,23 @@
     You should have received a copy of the GNU Affero General Public License
     along with makeclub.  If not, see <http://www.gnu.org/licenses/>.
 
- 
- 
 '''
-from user import UserList
-from user import UserView
-from club import ClubList, ClubView
-from clubedit import ClubEdit
-from url import urldict
-from member import Member
-from test import Test
-from activity import ActivityView, ActivityEdit, ActivityJoin, ActivityNew
+
+from google.appengine.ext import webapp
+from google.appengine.ext import db
+from models import Activity, Membership
+
+class ActivityView(webapp.RequestHandler):
+	def get(self, *args):
+		pass
+
+class ActivityJoin(webapp.RequestHandler):
+	def get(self, *args):
+		pass
+
+class ActivityEdit(webapp.RequestHandler):
+	def get(self, *args):
+		pass
+
+class ActivityNew(ActivityEdit):
+	pass

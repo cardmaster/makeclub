@@ -53,7 +53,7 @@ class Test(webapp.RequestHandler):
 			for entry in bill:
 				output ("Entry:", entry, ",", lb = False)
 			output()
-			output ("acts:", act.key(), "Total Expense:", act.expense, "Expanse Bill: ", bill)
+			output ("acts:", act.key().id(), "Total Expense:", act.expense, "Expanse Bill: ", bill)
 		
 		mem = Membership.all().get()
 		output ("New activity")
