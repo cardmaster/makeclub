@@ -74,9 +74,9 @@ urldict = dict (
 	ClubView = ModuleUrlConf('/club/%s', '/club/(\S+)/?$'),
 	ClubEdit = ModuleUrlConf('/club/%s/edit', '/club/(\S+)/edit/?$'),
 	Member   = MemberUrlConf('/member/%s/%s', '/member/.*'),
-	ActivityView = ModuleUrlConf('/act/%s', '/act/(\d+)?'),
-	ActivityEdit = ModuleUrlConf('/act/%s/edit', '/act/(\d+)/edit/?$'),
-	ActivityJoin = ModuleUrlConf('/act/%s/join', '/act/(\d+)/join/?$'),
+	ActivityView = ModuleUrlConf('/act/id/%s', '/act/(\d+)?'),
+	ActivityEdit = ModuleUrlConf('/act/id/%s/edit', '/act/id/(\d+)/edit/?$'),
+	ActivityJoin = ModuleUrlConf('/act/id/%s/join', '/act/id/(\d+)/join/?$'),
 	ActivityNew  = ModuleUrlConf('/act/new/%s', '/act/new/(\S+)/?$'),
 	Test     = ModuleUrlConf('/test/%s', extPattern('/test'))
 )
