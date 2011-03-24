@@ -17,9 +17,13 @@
 
 '''
 
+from google.appengine.api.users import get_current_user, create_login_url
 from google.appengine.ext import webapp
 from google.appengine.ext import db
-from models import Activity, Membership
+from errors import errorPage
+from models import Activity, Membership, Club
+from url import urldict
+from template import render
 
 class ActivityView(webapp.RequestHandler):
 	def get(self, *args):
@@ -30,8 +34,42 @@ class ActivityJoin(webapp.RequestHandler):
 		pass
 
 class ActivityEdit(webapp.RequestHandler):
+	def __init__(self, *args, **kw):
+		super (ActivityEdit, self).__init__(*args, **kw)
+		self.template = 'activity_edit.html'
+		self.urledit = urldict['ActivityEdit']
+	def getActModel(self, id):
+		return Activity.get_by_id(id)
+	def actionPath(self):
+		return self.request.path
+	def makeResponseText(self, act):
+		club = act.club
+		cluburl = urldict['ClubView'].path(club.slug)
+		templateVars = dict(club = club, cluburl = cluburl, act = act, action = self.actionPath() )
+		return render(self.template, templateVars)
 	def get(self, *args):
-		pass
+		aid, = self.urledit.analyze(self.request.path)
+		if (aid):
+			actobj = self.getActModel(aid)
+			if (actobj):
+				actExists = True
+				self.response.out.write (self.makeResponseText(actobj))
+		if (not actExists):
+			return errorPage("No such Activity", urldict['ClubList'].path(), self.response, 404)
 
 class ActivityNew(ActivityEdit):
-	pass
+	def get(self, *args):
+		urlcfg = urldict['ActivityNew']
+		slug, = urlcfg.analyze(self.request.path)
+		user = get_current_user()
+		if ((not user)):
+			return errorPage("Not login", create_login_url(self.request.url), self.response, 403)
+		club = Club.getClubBySlug(slug)
+		if (not club):
+			return errorPage("No such club", urldict['ClubList'].path(), self.response, 404)
+		newact = Activity.createDefault(user, club)
+		if (newact):
+			newact.bill = [('Filed Expense', 80), ('Balls Expense', 30)]
+			self.response.out.write (self.makeResponseText(newact))
+		else:
+			return errorPage("Server Error, can not create template.", self.request.url, self.response, 501)

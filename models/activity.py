@@ -28,11 +28,12 @@ The reason we seperate date&time is mainly for index the data, so we could use m
 filters in the contoler
 """
 class Activity(db.Model):
+	name = db.StringProperty(multiline=False, required=True)
+	intro = db.StringProperty(multiline=True)
 	organizer = db.UserProperty(required = True)
 	club = db.ReferenceProperty(Club, required = True)
-	date = db.DateProperty(indexed=True, auto_now=True, required=True)
-	time = db.TimeProperty(auto_now=True, required=True)
-	duration = db.FloatProperty() #Unit is hours
+	startTime = db.DateTimeProperty(indexed=True, auto_now=True, required=True)
+	duration = db.FloatProperty(required = True) #Unit is hours
 	expense = MoneyProperty()
 	bill = BillProperty()
 	def __init__(self, *args, **kw):
@@ -50,4 +51,11 @@ class Activity(db.Model):
 	def put(self):
 		self.expense = self.calcExpense()
 		return db.Model.put (self)
-	
+	@staticmethod
+	def createDefault(user, club):
+		if (user and club):
+			name = 'New Activity'
+			bill = []
+			return Activity(organizer = user, club = club, name = name, bill = bill, duration = 2.2)
+		else:
+			return None
