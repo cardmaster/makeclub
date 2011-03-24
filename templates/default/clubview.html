@@ -30,6 +30,11 @@
 			{% endif %}
 		{% endif %}
 		</div>
+		{% if newAct %}
+		<div class="clubOperations"> 
+			<a href="{{ newAct }}" >Create New Activity</a>
+		</div>
+		{% endif %}
 		<div class="clubMembers">
 			<div class="clubMemebersHeader">
 			Members of Club {{ club.name }}
