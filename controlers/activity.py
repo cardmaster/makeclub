@@ -39,7 +39,8 @@ class ActivityEdit(webapp.RequestHandler):
 		self.template = 'activity_edit.html'
 		self.urledit = urldict['ActivityEdit']
 	def getActModel(self, id):
-		return Activity.get_by_id(id)
+		iid = int(id)
+		return Activity.get_by_id(iid)
 	def actionPath(self):
 		return self.request.path
 	def makeResponseText(self, act):
@@ -56,6 +57,9 @@ class ActivityEdit(webapp.RequestHandler):
 				self.response.out.write (self.makeResponseText(actobj))
 		if (not actExists):
 			return errorPage("No such Activity", urldict['ClubList'].path(), self.response, 404)
+	def post(self, *args):
+		print "Handling Post"
+		print self.request
 
 class ActivityNew(ActivityEdit):
 	def get(self, *args):

@@ -57,10 +57,10 @@ class Test(webapp.RequestHandler):
 		
 		mem = Membership.all().get()
 		output ("New activity")
-		act = Activity(organizer = mem.user, club = mem.club, bill = billList, expense = '100' )
+		act = Activity(name = "test act", duration=2.0, organizer = mem.user, club = mem.club, bill = billList, expense = '100' )
 		output ("Expense:", act.expense)
 		output ("Bill:", act.bill)
 		output ("Now, put")
 		key = act.put()
-		output ("Act Saved: ", act.is_saved(), "Key is ", key)
+		output ("Act Saved: ", act.is_saved(), "Key is ", key, " Id is", key.id())
 		respo("</body></html>")
