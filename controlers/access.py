@@ -20,12 +20,12 @@
 '''
 from google.appengine.api import users
 
-activities = [
+operations = [
 	"listclubs",
 	"createClub"
 ]
 
-clubActivities = [
+clubOperations = [
 	"view",
 	"create",
 	"edit",
@@ -34,10 +34,19 @@ clubActivities = [
 	"finish"
 ]
 
-def isAccessible (user, activity):
+actOperatoins = [
+	"create",
+	"view",
+	"edit",
+	"join"
+]
+
+def isAccessible (user, operation):
 	return True
 
-def hasClubPrivilige (user, club, activity):
+def hasClubPrivilige (user, club, operation):
 	return True
 
+def hasClubPrivilige (user, act, operation):
+	return True
 
