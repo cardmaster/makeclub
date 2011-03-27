@@ -31,11 +31,11 @@ clubOperations = [
 	"edit",
 	"delete",
 	"arrange",
-	"finish"
+	"finish",
+	"newact"
 ]
 
 actOperatoins = [
-	"create",
 	"view",
 	"edit",
 	"join"
@@ -47,6 +47,6 @@ def isAccessible (user, operation):
 def hasClubPrivilige (user, club, operation):
 	return True
 
-def hasClubPrivilige (user, act, operation):
+def hasActPrivilige (user, act, operation):
 	return True
 
