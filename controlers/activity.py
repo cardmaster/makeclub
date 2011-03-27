@@ -74,9 +74,24 @@ class ActivityEdit(webapp.RequestHandler):
 				return
 		else:
 			return errorPage("No such Activity", urldict['ClubList'].path(), self.response, 404)
+	def updateObject(self, actobj):
+		#Will read data from postdata, and update the pass-in actobj.
+		pass
 	def post(self, *args):
-		print "Handling Post"
-		print self.request
+		actobj = self.getActModel()
+		if (actobj):
+			self.actobj = actobj
+			if (self.checkPrivilige()):
+				self.updateObject(actobj)
+				key = actobj.put()
+				if (key):
+					return errorPage("Successfully storing this Activity", 
+									urldict['ActivityView'].path(key.id()), self.response, 200)
+				else:
+					return errorPage("Error while storing this Activity", 
+									urldict['ActivityEdit'].path(actobj.key().id()), self.response, 501)
+		else:
+			return errorPage("No such Activity", urldict['ClubList'].path(), self.response, 404)
 
 class ActivityNew(ActivityEdit):
 	def getActModel(self):
