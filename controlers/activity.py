@@ -99,5 +99,3 @@ class ActivityNew(ActivityEdit):
 			errorPage ("Not Authorized to edit", urldict['ClubVew'].getPath(self.actobj.club.slug), self.response, 403)
 			return False
 		return True
-	def get(self, *args):
-		super (ActivityNew, self).get(*args)
