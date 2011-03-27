@@ -26,23 +26,13 @@ from models import Activity, Membership, Club
 from url import urldict
 from template import render
 
-class ActivityView(webapp.RequestHandler):
-	def get(self, *args):
-		pass
-
-class ActivityJoin(webapp.RequestHandler):
-	def get(self, *args):
-		pass
-
-class ActivityEdit(webapp.RequestHandler):
+class ActivityBase(webapp.RequestHandler):
 	def __init__(self, *args, **kw):
-		super (ActivityEdit, self).__init__(*args, **kw)
-		self.template = 'activity_edit.html'
-		self.urledit = urldict['ActivityEdit']
+		super(ActivityBase, self).__init__(*args, **kw)
 		self.actobj = None
-		self.actOperation = "edit"
+		
 	def getActModel(self):
-		aid, = self.urledit.analyze(self.request.path)
+		aid, = self.urlcfg.analyze(self.request.path)
 		if (aid):
 			id = int(aid)
 			return Activity.get_by_id(id)
@@ -50,10 +40,14 @@ class ActivityEdit(webapp.RequestHandler):
 			return None
 	def actionPath(self):
 		return self.request.path
-	def makeResponseText(self, act):
+	def templateParams(self):
+		act = self.actobj
 		club = act.club
 		cluburl = urldict['ClubView'].path(club.slug)
 		templateVars = dict(club = club, cluburl = cluburl, act = act, action = self.actionPath() )
+		return templateVars
+	def makeResponseText(self, act):
+		templateVars = self.templateParams()
 		return render(self.template, templateVars)
 	def checkPrivilige(self):
 		user = get_current_user()
@@ -61,7 +55,9 @@ class ActivityEdit(webapp.RequestHandler):
 			errorPage ("Not login", create_login_url(self.request.url), self.response, 403)
 			return False
 		if (not hasActPrivilige(user, self.actobj, self.actOperation)):
-			errorPage ("Not Authorized to edit", urldict['ClubVew'].getPath(self.actobj.club.slug), self.response, 403)
+			errorPage ("Not authorrized", 
+					urldict['ClubVew'].getPath(self.actobj.club.slug), 
+					self.response, 403)
 			return False
 		return True
 			
@@ -75,6 +71,31 @@ class ActivityEdit(webapp.RequestHandler):
 				return
 		else:
 			return errorPage("No such Activity", urldict['ClubList'].path(), self.response, 404)
+
+
+class ActivityView(ActivityBase):
+	def __init__(self, *args, **kw):
+		super (ActivityView, self).__init__(*args, **kw)
+		self.template = 'activity_view.html'
+		self.urlcfg = urldict['ActivityView']
+		self.actOperation = "view"
+	def templateParams(self):
+		defaults = super (ActivityView, self).templateParams()
+		if (hasActPrivilige(get_current_user(), self.actobj, "edit" )):
+			defaults['editurl'] = urldict['ActivityEdit'].path(self.actobj.key().id() )
+		return defaults
+	
+class ActivityJoin(webapp.RequestHandler):
+	def get(self, *args):
+		pass
+
+class ActivityEdit(ActivityBase):
+	def __init__(self, *args, **kw):
+		super (ActivityEdit, self).__init__(*args, **kw)
+		self.template = 'activity_edit.html'
+		self.urlcfg = urldict['ActivityEdit']
+		self.actobj = None
+		self.actOperation = "edit"
 	def updateObject(self, actobj):
 		#Will read data from postdata, and update the pass-in actobj.
 		pass
