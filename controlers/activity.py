@@ -21,6 +21,7 @@ from google.appengine.api.users import get_current_user, create_login_url
 from google.appengine.ext import webapp
 from google.appengine.ext import db
 from errors import errorPage
+from access import hasActPrivilige, hasClubPrivilige
 from models import Activity, Membership, Club
 from url import urldict
 from template import render
@@ -38,9 +39,14 @@ class ActivityEdit(webapp.RequestHandler):
 		super (ActivityEdit, self).__init__(*args, **kw)
 		self.template = 'activity_edit.html'
 		self.urledit = urldict['ActivityEdit']
-	def getActModel(self, id):
-		iid = int(id)
-		return Activity.get_by_id(iid)
+		self.actobj = None
+	def getActModel(self):
+		aid, = self.urledit.analyze(self.request.path)
+		if (aid):
+			id = int(aid)
+			return Activity.get_by_id(id)
+		else:
+			return None
 	def actionPath(self):
 		return self.request.path
 	def makeResponseText(self, act):
@@ -48,32 +54,50 @@ class ActivityEdit(webapp.RequestHandler):
 		cluburl = urldict['ClubView'].path(club.slug)
 		templateVars = dict(club = club, cluburl = cluburl, act = act, action = self.actionPath() )
 		return render(self.template, templateVars)
+	def checkPrivilige(self):
+		user = get_current_user()
+		if (not user):
+			errorPage ("Not login", create_login_url(self.request.url), self.response, 403)
+			return False
+		if (not hasActPrivilige(user, self.actobj, "edit")):
+			errorPage ("Not Authorized to edit", urldict['ClubVew'].getPath(self.actobj.club.slug), self.response, 403)
+			return False
+		return True
+			
 	def get(self, *args):
-		aid, = self.urledit.analyze(self.request.path)
-		if (aid):
-			actobj = self.getActModel(aid)
-			if (actobj):
-				actExists = True
+		actobj = self.getActModel()
+		if (actobj):
+			self.actobj = actobj
+			if (self.checkPrivilige()):
 				self.response.out.write (self.makeResponseText(actobj))
-		if (not actExists):
+			else:
+				return
+		else:
 			return errorPage("No such Activity", urldict['ClubList'].path(), self.response, 404)
 	def post(self, *args):
 		print "Handling Post"
 		print self.request
 
 class ActivityNew(ActivityEdit):
-	def get(self, *args):
+	def getActModel(self):
 		urlcfg = urldict['ActivityNew']
 		slug, = urlcfg.analyze(self.request.path)
 		user = get_current_user()
-		if ((not user)):
-			return errorPage("Not login", create_login_url(self.request.url), self.response, 403)
 		club = Club.getClubBySlug(slug)
-		if (not club):
-			return errorPage("No such club", urldict['ClubList'].path(), self.response, 404)
-		newact = Activity.createDefault(user, club)
-		if (newact):
-			newact.bill = [('Filed Expense', 80), ('Balls Expense', 30)]
-			self.response.out.write (self.makeResponseText(newact))
+		if (user and club):
+			newact = Activity.createDefault(user, club)
+			if (newact): newact.bill = [('Filed Expense', 80), ('Balls Expense', 30)]
+			return newact
 		else:
-			return errorPage("Server Error, can not create template.", self.request.url, self.response, 501)
+			return None
+	def checkPrivilige(self):
+		user = get_current_user()
+		if (not user):
+			errorPage ("Not login", create_login_url(self.request.url), self.response, 403)
+			return False
+		if (not hasClubPrivilige(user, self.actobj.club, "newact")):
+			errorPage ("Not Authorized to edit", urldict['ClubVew'].getPath(self.actobj.club.slug), self.response, 403)
+			return False
+		return True
+	def get(self, *args):
+		super (ActivityNew, self).get(*args)
