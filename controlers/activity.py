@@ -40,6 +40,7 @@ class ActivityEdit(webapp.RequestHandler):
 		self.template = 'activity_edit.html'
 		self.urledit = urldict['ActivityEdit']
 		self.actobj = None
+		self.actOperation = "edit"
 	def getActModel(self):
 		aid, = self.urledit.analyze(self.request.path)
 		if (aid):
@@ -59,7 +60,7 @@ class ActivityEdit(webapp.RequestHandler):
 		if (not user):
 			errorPage ("Not login", create_login_url(self.request.url), self.response, 403)
 			return False
-		if (not hasActPrivilige(user, self.actobj, "edit")):
+		if (not hasActPrivilige(user, self.actobj, self.actOperation)):
 			errorPage ("Not Authorized to edit", urldict['ClubVew'].getPath(self.actobj.club.slug), self.response, 403)
 			return False
 		return True
