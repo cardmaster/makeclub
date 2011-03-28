@@ -89,6 +89,35 @@ class ActivityJoin(webapp.RequestHandler):
 	def get(self, *args):
 		pass
 
+def extractRequestData(request, interested):
+	retval = dict()
+	for (key, valid) in interested.iteritems() :
+		val = valid (request.get(key))
+		if (val):
+			retval [key] = val
+	return retval
+
+import re
+def parseDuration(times):
+	 #support only h
+	 tstr = times[:-1]
+	 print "Times String: ", tstr
+	 return float(tstr)
+	
+def parseBill (billstr):
+	entries = billstr.split (',')
+	ary = []
+	i = 1
+	for ent in entries:
+		if (i == 2):
+			val = ent
+			ary.push ( (key, val) )
+			i = 0
+		else :
+			key = ent
+		i += 1
+	return ary
+
 class ActivityEdit(ActivityBase):
 	def __init__(self, *args, **kw):
 		super (ActivityEdit, self).__init__(*args, **kw)
@@ -97,6 +126,10 @@ class ActivityEdit(ActivityBase):
 		self.actobj = None
 		self.actOperation = "edit"
 	def updateObject(self, actobj):
+		interested = dict (name = str, intro = str, duration = parseDuration, bill = parseBill)
+		reqs = extractRequestData (self.request, interested)
+		for (key, val) in reqs.iteritems():
+			setattr (actobj, key, val)
 		#Will read data from postdata, and update the pass-in actobj.
 		pass
 	def post(self, *args):
