@@ -25,4 +25,4 @@ from clubedit import ClubEdit
 from url import urldict
 from member import Member
 from test import Test
-from activity import ActivityView, ActivityEdit, ActivityJoin, ActivityNew
+from activity import ActivityView, ActivityEdit, ActivityParticipate, ActivityNew

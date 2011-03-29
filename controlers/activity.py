@@ -85,9 +85,13 @@ class ActivityView(ActivityBase):
 			defaults['editurl'] = urldict['ActivityEdit'].path(self.actobj.key().id() )
 		return defaults
 	
-class ActivityJoin(webapp.RequestHandler):
+class ActivityParticipate(webapp.RequestHandler):
 	def get(self, *args):
-		pass
+		urlcfg = urldict['ActivityParticipate']
+		id, oper = urlcfg.analyze(self.request.path)
+		self.response.out.write ( 
+			'on id %s, operation %s' % (id, oper)
+		)
 
 def extractRequestData(request, interested):
 	retval = dict()
