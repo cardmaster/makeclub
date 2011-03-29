@@ -28,7 +28,7 @@ We use this rule:
 						when post data to a non-exits membership, will cause a create.
 /activity/<slug>/<aid>	display activity of a club(slug=<slug>, aid=<aid)
 /activity/<slug>/<aid>/edit	edit activity of a club(slug=<slug>, aid=<aid)
-/activity/<slug>/<aid>/join	join an activity of a club(slug=<slug>, aid=<aid), if specify an 'targetUser'
+/activity/<slug>/<aid>/(join|quit|confirm)	join an activity of a club(slug=<slug>, aid=<aid), if specify an 'targetUser'
 							field in request data, will cause this targetUser join this activity
 '''
 
