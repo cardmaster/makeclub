@@ -20,3 +20,4 @@
 '''
 from membership import Membership
 from club import Club
+from activity import Activity

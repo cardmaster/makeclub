@@ -1,0 +1,53 @@
+<html>
+	<head>
+		<title>Activity</title>
+	</head>
+	<body>
+		{% if postStatus %}
+		<div class="postStatus">{{ postStatus }} saved membership between <a href="{{ cluburl }}">{{ act.club.name }}</a></div>
+		{% endif %}
+		<h1>Activity of Club <a href="{{ cluburl }}">{{ club.name }}</a></h1>
+		<div class="infoLine"><span class="inputName">Activity Name:&nbsp; </span>
+			<span type="text" id="name" >{{ act.name }}</span>  </div>
+		<div class="infoLine"><span class="inputName">Start Time: </span>
+			<span type="text" id="startTime" >{{ act.startTime }}</span>  </div>
+		<div class="infoLine"><span class="inputName">Duration: </span>
+			<span type="text" id="startTime" >{{ act.duration }}h</span> 
+			<div class="infoLine"><span class="inputName">Introduction</span><br />
+				<div class="introText" id="actIntro" >{{ act.intro }}</div>
+			</div>
+			<div class="infoLine"><span class="inputName">Bill</span><br />
+				<div name="intro" class="introText" id="actIntro" >
+				{% for bentry in act.bill %}
+					{% for item in bentry %}{{ item }},{% endfor %}
+				{% endfor %}</textarea><br />
+				<span class="inputName">Expense: </span>
+				<span id="totalExpense" >{{ act.expense }}</span>
+			</div>
+			{% if editurl %}
+			<div class="infoLine"><a href="{{ editurl }}">Edit this activity</a></div>
+			{% endif %}
+
+			<div class="specialOperationContainer">
+				<form id="billActivity" name="sendBill" method="post" action="{{ action }}">
+					<input type="hidden" name="bill" value="True" />
+					<input type="submit" name="bill" value="Sen Bill To Participants" />
+				</form>
+			</div>
+
+			<div class="specialOperationContainer">
+				<form id="joinActivity" name="join" method="post" action="{{ action }}">
+					<input type="hidden" name="join" value="True" />
+					<input type="submit" name="joinAct" value="Join This Activity" />
+				</form>
+			</div>
+
+			<div class="specialOperationContainer">
+				<form id="deleteActivity" name="delete" method="post" action="{{ action }}">
+					<input type="hidden" name="delete" value="True" />
+					<input type="submit" name="remove" value="Remove This Activity" />
+				</form>
+			</div>
+
+		</body>
+	</html>

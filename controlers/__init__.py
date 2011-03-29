@@ -20,8 +20,9 @@
 '''
 from user import UserList
 from user import UserView
-from club import ClubList
-from club import ClubView
+from club import ClubList, ClubView
 from clubedit import ClubEdit
 from url import urldict
 from member import Member
+from test import Test
+from activity import ActivityView, ActivityEdit, ActivityJoin, ActivityNew
