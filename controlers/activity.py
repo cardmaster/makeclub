@@ -81,8 +81,14 @@ class ActivityView(ActivityBase):
 		self.actOperation = "view"
 	def templateParams(self):
 		defaults = super (ActivityView, self).templateParams()
-		if (hasActPrivilige(get_current_user(), self.actobj, "edit" )):
-			defaults['editurl'] = urldict['ActivityEdit'].path(self.actobj.key().id() )
+		user = get_current_user();
+		aid = self.actobj.key().id()
+		if (hasActPrivilige(user, self.actobj, "edit" )):
+			defaults['editurl'] = urldict['ActivityEdit'].path(aid)
+		urlcfg = urldict['Activity']
+		for oper in ('bill', 'join', 'quit', 'confirm'):
+			if (hasActPrivilige(user, self.actobj, oper) ):
+				defaults['%surl' % oper] = urlcfg.path(aid, oper)
 		return defaults
 	
 class ActivityParticipate(webapp.RequestHandler):
