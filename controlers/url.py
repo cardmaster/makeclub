@@ -49,7 +49,8 @@ class ModuleUrlConf(object):
 		else:
 			self.pattern = pattern
 	def path(self, *args):
-		return self.base % args
+		strs = tuple ([str(arg) for arg in args])
+		return self.base % strs
 	def analyze(self, path):
 		reg = re.compile(self.pattern)
 		mat = reg.match (path)
