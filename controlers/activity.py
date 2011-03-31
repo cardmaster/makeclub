@@ -17,12 +17,12 @@
 
 '''
 
-from google.appengine.api.users import get_current_user, create_login_url
+from google.appengine.api.users import get_current_user, create_login_url, User
 from google.appengine.ext import webapp
 from google.appengine.ext import db
 from errors import errorPage
 from access import hasActPrivilige, hasClubPrivilige
-from models import Activity, Membership, Club
+from models import Activity, Membership, Club, ActivityParticipator
 from url import urldict
 from template import render
 
@@ -72,6 +72,12 @@ class ActivityBase(webapp.RequestHandler):
 		else:
 			return errorPage("No such Activity", urldict['ClubList'].path(), self.response, 404)
 
+class SpecialOp:
+	def __init__(self, oper = '', url = '', needPost = False, data = [] ):
+		self.oper = oper
+		self.url = url
+		self.needPost = needPost
+		self.data = data
 
 class ActivityView(ActivityBase):
 	def __init__(self, *args, **kw):
@@ -81,13 +87,76 @@ class ActivityView(ActivityBase):
 		self.actOperation = "view"
 	def templateParams(self):
 		defaults = super (ActivityView, self).templateParams()
-		if (hasActPrivilige(get_current_user(), self.actobj, "edit" )):
-			defaults['editurl'] = urldict['ActivityEdit'].path(self.actobj.key().id() )
+		user = get_current_user();
+		aid = self.actobj.key().id()
+		specialOps = []
+		if (hasActPrivilige(user, self.actobj, "edit" )):
+			sop = SpecialOp('edit', urldict['ActivityEdit'].path(aid), False)
+			specialOps.append(sop)
+		urlcfg = urldict['ActivityParticipate']
+		for oper in ('bill', 'join', 'quit', 'confirm'):
+			if (hasActPrivilige(user, self.actobj, oper) ):
+				data = [('target', user.email()), ]
+				sop = SpecialOp(oper, urlcfg.path(aid, oper), True, data)
+				specialOps.append(sop)
+		defaults['specialOps'] = specialOps
 		return defaults
 	
-class ActivityJoin(webapp.RequestHandler):
+class ActivityParticipate(webapp.RequestHandler):
+	def getActModel(self, id):
+		try:
+			iid = int(id)
+		except:
+			return None
+		actobj = Activity.get_by_id(iid)	
+		return actobj
 	def get(self, *args):
-		pass
+		urlcfg = urldict['ActivityParticipate']
+		id, oper = urlcfg.analyze(self.request.path)
+		self.response.out.write ( 
+			'on id %s, operation %s' % (id, oper)
+		)
+	def post(self, *args):
+		urlcfg = urldict['ActivityParticipate']
+		id, oper = urlcfg.analyze(self.request.path)
+		id = int(id)
+		actobj = self.getActModel(id)
+		if (not actobj):
+			return errorPage ("No such activity", urldict['ClubList'].path(), 404)
+		user = get_current_user();
+		if (not user):
+			return errorPage ("Not login", create_login_url(self.request.url), self.response, 403)
+		target = self.request.get ('target')
+		cluburl = urldict['ClubView'].path(actobj.club.slug)
+		if (not hasActPrivilige(user, actobj, oper,target) ):
+			return errorPage ("Can not access", cluburl, self.response, 403)
+		if (target):
+			targetUser = User(target)
+			if(not targetUser):
+				return errorPage ("Illegal access", cluburl, self.response, 403)
+		else:
+			targetUser = user
+			
+		mem = Membership.between (user, actobj.club)
+		if (not mem):
+			return errorPage ("Not a member", cluburl, self.response, 403)
+		
+		acturl = urldict['ActivityView'].path(id)
+		if (oper == 'join'):
+			actp = ActivityParticipator(member = mem, activity = actobj)
+			actp.put()
+			return errorPage ("Successfully Joined", acturl, self.response, 200)
+		elif (oper == 'quit'):
+			actp = ActivityParticipator.between(mem, actobj)
+			actp.delete()
+			return errorPage ("Successfully Quited", acturl, self.response, 200)
+		elif (oper == 'confirm'):
+			actp = ActivityParticipator.between(mem, actobj)
+			actp.confirmed = True
+			actp.put()
+			return errorPage ("Successfully Confirmed", acturl, self.response, 200)
+		elif (oper == 'bill'):
+			return errorPage ("Not Implemented", acturl, self.response, 501)
 
 def extractRequestData(request, interested):
 	retval = dict()

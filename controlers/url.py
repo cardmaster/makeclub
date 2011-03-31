@@ -28,7 +28,7 @@ We use this rule:
 						when post data to a non-exits membership, will cause a create.
 /activity/<slug>/<aid>	display activity of a club(slug=<slug>, aid=<aid)
 /activity/<slug>/<aid>/edit	edit activity of a club(slug=<slug>, aid=<aid)
-/activity/<slug>/<aid>/join	join an activity of a club(slug=<slug>, aid=<aid), if specify an 'targetUser'
+/activity/<slug>/<aid>/(join|quit|confirm)	join an activity of a club(slug=<slug>, aid=<aid), if specify an 'targetUser'
 							field in request data, will cause this targetUser join this activity
 '''
 
@@ -49,7 +49,8 @@ class ModuleUrlConf(object):
 		else:
 			self.pattern = pattern
 	def path(self, *args):
-		return self.base % args
+		strs = tuple ([str(arg) for arg in args])
+		return self.base % strs
 	def analyze(self, path):
 		reg = re.compile(self.pattern)
 		mat = reg.match (path)
@@ -76,7 +77,7 @@ urldict = dict (
 	Member   = MemberUrlConf('/member/%s/%s', '/member/.*'),
 	ActivityView = ModuleUrlConf('/act/id/%s', '/act/id/(\d+)/?$'),
 	ActivityEdit = ModuleUrlConf('/act/id/%s/edit', '/act/id/(\d+)/edit/?$'),
-	ActivityJoin = ModuleUrlConf('/act/id/%s/join', '/act/id/(\d+)/join/?$'),
+	ActivityParticipate = ModuleUrlConf('/act/id/%s/%s', '/act/id/(\d+)/(join|quit|confirm|bill)/?$'),
 	ActivityNew  = ModuleUrlConf('/act/new/%s', '/act/new/(\S+)/?$'),
 	Test     = ModuleUrlConf('/test/%s', extPattern('/test'))
 )

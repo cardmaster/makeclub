@@ -41,12 +41,12 @@ actOperatoins = [
 	"join"
 ]
 
-def isAccessible (user, operation):
+def isAccessible (user, operation, target = None):
 	return True
 
-def hasClubPrivilige (user, club, operation):
+def hasClubPrivilige (user, club, operation, target = None):
 	return True
 
-def hasActPrivilige (user, act, operation):
+def hasActPrivilige (user, act, operation, target = None):
 	return True
 

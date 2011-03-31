@@ -59,3 +59,26 @@ class Activity(db.Model):
 			return Activity(organizer = user, club = club, name = name, bill = bill, duration = 2.2)
 		else:
 			return None
+
+class ActivityParticipator(db.Model):
+	activity = db.ReferenceProperty(Activity, required=True)
+	member = db.ReferenceProperty(Membership, required=True)
+	expense = MoneyProperty(default = '0')
+	#Either Confirmed by Organizer or yourself, after confirmed, you cannot quit.
+	confirmed = db.BooleanProperty(default = False)
+	def copy(self, oth):
+		self.expense = oth.expense
+		self.confirmed = oth.confirmed
+	@staticmethod
+	def between(mem, act):
+		q = Membership.all()
+		q.filter('member = ', mem).filter('activity = ', act)
+		return q.get()
+	
+	def put(self):
+		oldms = Membership.between(self.member, self.activity)
+		entry = self
+		if (oldms):
+			oldms.copy(self)
+			entry = oldms
+		return db.Model.put (entry)
