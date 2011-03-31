@@ -71,7 +71,7 @@ class MemberUrlConf(ModuleUrlConf):
 		return result
 
 urldict = dict (
-	ClubList = ModuleUrlConf('/clubs', extPattern('/clubs') ),
+	ClubList = ModuleUrlConf('/clubs', extPattern('(/$|/clubs)') ),
 	ClubView = ModuleUrlConf('/club/%s', '/club/(\S+)/?$'),
 	ClubEdit = ModuleUrlConf('/club/%s/edit', '/club/(\S+)/edit/?$'),
 	Member   = MemberUrlConf('/member/%s/%s', '/member/.*'),
