@@ -19,7 +19,7 @@
  
 '''
 from google.appengine.ext import webapp
-from models import Club, Membership
+from models import Club, Membership, Activity
 from access import hasClubPrivilige, isAccessible
 from helper import lastWordOfUrl
 from url import urldict
@@ -73,6 +73,14 @@ class ClubView(webapp.RequestHandler):
 			mq = Membership.all()
 			mq.filter ('club = ', club)
 			templatevars['members'] = mq
+			aq = Activity.all()
+			aq.filter ('club = ', club)
+			avpath = urldict['ActivityView'].path
+			actlist = []
+			for act in aq:
+				act.linkpath = avpath (act.key().id())
+				actlist.append (act)
+			templatevars['acts'] = actlist
 			self.response.out.write (render(self.template, templatevars) )
 		else:
 			self.response.set_status(404)

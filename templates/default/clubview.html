@@ -35,7 +35,7 @@
 			<a href="{{ newAct }}" >Create New Activity</a>
 		</div>
 		{% endif %}
-		<div class="clubMembers">
+		<div class="listContainer">
 			<div class="clubMemebersHeader">
 			Members of Club {{ club.name }}
 			</div>
@@ -43,6 +43,18 @@
 			<ul>
 			{% for member in members %}
 			   <li>{{ member.user }}, {{ member.name }}</li>
+			{% endfor %}
+			</ul>
+			</div>
+		</div>
+		<div class="listContainer">
+			<div class="listHeader">
+			Activities of Club {{ club.name }}
+			</div>
+			<div class="listArea">
+			<ul>
+			{% for act in acts %}
+			   <li><a href="{{ act.linkpath }}">{{ act.name }}</a>, {{ act.startTime }} duration {{ act.duration }} hours</li>
 			{% endfor %}
 			</ul>
 			</div>
