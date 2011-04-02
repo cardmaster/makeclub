@@ -4,6 +4,7 @@
 </head>
 <body>
 <h1>Club List</h1>
+<div class="listContainer">
 {% for club in clubs %}
 <div class="clubLine">
 	<span class="name">
@@ -17,5 +18,11 @@
 	</span>
 </div>
 {% endfor %}
+</div>
+{% if newcluburl %}
+<div class="specialOperationContainer">
+<a href="{{ newcluburl }}">Create New Club</a>
+</div>
+{% endif %}
 </body>
 </html>

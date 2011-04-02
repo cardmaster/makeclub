@@ -108,7 +108,7 @@ class ClubEdit(webapp.RequestHandler):
 			if ( self.editOrCreateRight(user, clubmd) ):
 				self.clubmodel = clubmd
 				clubmd.put()
-				self.redirect (self.urlconf.path(clubmd.slug) )
+				errorPage ("Successfullyt Saved Club", urldict['ClubView'].path(clubmd.slug), self.response, 200)
 			else:
 				return
 		else:

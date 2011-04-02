@@ -25,6 +25,7 @@ from helper import lastWordOfUrl
 from url import urldict
 from errors import errorPage
 from template import render
+from datetime import datetime
 
 editurlconf = urldict['ClubEdit']
 listurlconf = urldict['ClubList']
@@ -39,7 +40,10 @@ class ClubList(webapp.RequestHandler):
 	def get(self, *args):
 		if (isAccessible('', 'listclubs')):
 			clubs = Club.all()
-			vars = dict (clubs=Club.all(), cluburl=viewurlconf.path('')[:-1])
+			nowdt = datetime.now()
+			newslug = "newclb_%d%d%d%d%d%d%d" % (nowdt.year, nowdt.month, nowdt.day, nowdt.hour, nowdt.minute, nowdt.second, nowdt.microsecond)
+			vars = dict (clubs=Club.all(), cluburl=viewurlconf.path('')[:-1], 
+						newcluburl = editurlconf.path(newslug) )
 			self.response.out.write (render(self.template, vars) )
 		else:
 			errorPage("Not Accessible", users.create_login_url(self.request.uri), self.response)

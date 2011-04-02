@@ -52,7 +52,7 @@
 		<div class="listBody">
 		<ul>
 		{% for parti in participators %}
-			<li>{{ parti.member.user }}
+			<li>{{ parti.member.name }} &lt;<a href="mailto:{{ parti.member.email }}">{{ parti.member.email }}</a>&gt;
 			{% if parti.confirmed %}
 			<font class="memberConfirmed">Confirmed</font>
 			{% endif %} 
