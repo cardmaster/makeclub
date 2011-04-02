@@ -66,12 +66,15 @@ class ActivityParticipator(db.Model):
 	expense = MoneyProperty(default = '0')
 	#Either Confirmed by Organizer or yourself, after confirmed, you cannot quit.
 	confirmed = db.BooleanProperty(default = False)
+	def __init__(self, *args, **kw):
+		super(ActivityParticipator, self).__init__(*args, **kw)
 	def copy(self, oth):
 		self.expense = oth.expense
-		self.confirmed = oth.confirmed
+		if (not self.confirmed): #Confirmation can not be canceled
+			self.confirmed = oth.confirmed
 	@staticmethod
 	def between(mem, act):
-		q = Membership.all()
+		q = ActivityParticipator.all()
 		q.filter('member = ', mem).filter('activity = ', act)
 		return q.get()
 	

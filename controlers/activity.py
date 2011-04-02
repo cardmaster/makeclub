@@ -100,6 +100,9 @@ class ActivityView(ActivityBase):
 				sop = SpecialOp(oper, urlcfg.path(aid, oper), True, data)
 				specialOps.append(sop)
 		defaults['specialOps'] = specialOps
+		apq = ActivityParticipator.all()
+		apq.filter ('activity = ', self.actobj)
+		defaults['participators'] = apq
 		return defaults
 	
 class ActivityParticipate(webapp.RequestHandler):
@@ -143,18 +146,27 @@ class ActivityParticipate(webapp.RequestHandler):
 		
 		acturl = urldict['ActivityView'].path(id)
 		if (oper == 'join'):
-			actp = ActivityParticipator(member = mem, activity = actobj)
-			actp.put()
+			actp = ActivityParticipator.between (mem, actobj)
+			if (not actp):
+				actp = ActivityParticipator(member = mem, activity = actobj)
+				actp.put()
 			return errorPage ("Successfully Joined", acturl, self.response, 200)
 		elif (oper == 'quit'):
 			actp = ActivityParticipator.between(mem, actobj)
-			actp.delete()
+			if (actp):
+				if (actp.confirmed):
+					return errorPage ("Cannot delete confirmed participator", acturl, self.response, 403)
+				else:
+					actp.delete()
 			return errorPage ("Successfully Quited", acturl, self.response, 200)
 		elif (oper == 'confirm'):
 			actp = ActivityParticipator.between(mem, actobj)
-			actp.confirmed = True
-			actp.put()
-			return errorPage ("Successfully Confirmed", acturl, self.response, 200)
+			if (actp):
+				actp.confirmed = True
+				actp.put()
+				return errorPage ("Successfully Confirmed", acturl, self.response, 200)
+			else:
+				return errorPage ("No Such a Member", acturl, self.response, 404)
 		elif (oper == 'bill'):
 			return errorPage ("Not Implemented", acturl, self.response, 501)
 
@@ -206,6 +218,9 @@ class ActivityEdit(ActivityBase):
 		if (actobj):
 			self.actobj = actobj
 			if (self.checkPrivilige()):
+				if (self.request.get ('delete', False)):
+					actobj.delete()
+					return errorPage ("Successful deleted", "/", self.response, 200)
 				self.updateObject(actobj)
 				key = actobj.put()
 				if (key):

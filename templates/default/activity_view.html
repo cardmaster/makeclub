@@ -46,5 +46,20 @@
 			{% endif %}
 		</div>
 		{% endfor %}
+		
+		<div class="listContainer">
+		<div class="listHead">Participators</div>
+		<div class="listBody">
+		<ul>
+		{% for parti in participators %}
+			<li>{{ parti.member.user }}
+			{% if parti.confirmed %}
+			<font class="memberConfirmed">Confirmed</font>
+			{% endif %} 
+			</li>
+		{% endfor %}
+		</ul>
+		</div>
+		</div>
 	</body>
 </html>
