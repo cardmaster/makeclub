@@ -13,8 +13,9 @@
 		<div class="applyClub">
 		{% if membership %}
 		<div class="yourMembership">
-		You are member of this club (<a href="/member/{{ club.slug }}">{{membership.name}}</a>&lt;<a href="mailto:{{ membership.email }}">{{ membership.email }}</a>&gt;). 
+		You are member of this club ({{membership.name}}&lt;<a href="mailto:{{ membership.email }}">{{ membership.email }}</a>&gt;). 
 		balance: <span class="userbalance">{{ membership.balance }}</span>
+		| <a href="/member/{{ club.slug }}">Edit My Member Ship</a>  
 		</div>
 		{% else %}
 			{% if userName %}
@@ -22,8 +23,8 @@
 		<div class="applyInfo">
 		<span class="inputPropmt namePrompt">Name In Club: </span><input type="text" name="name" text="{{ userName }}" />
 		<span class="inputPropmt namePrompt">Email In Club: </span><input type="text" name="email" text="{{ userEmail }}" />
-		</div>
 		<input class="submit" type="submit" value="Join This Club" />
+		</div>
 		</form>
 			{% else %}
 		Please <a alt="click to login" href="{{ loginUrl }}">log in</a> before join this club.
