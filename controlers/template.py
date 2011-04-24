@@ -22,7 +22,10 @@ from google.appengine.dist import use_library
 use_library('django', '1.2')
 from google.appengine.ext.webapp import template
 import os
+from url import urldict
 
+register = template.create_template_register()
+	
 def templateFolder():
 	return (os.path.join(os.path.dirname(__file__), '../templates'))
 def templateSet():

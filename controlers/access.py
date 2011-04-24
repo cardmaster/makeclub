@@ -21,7 +21,7 @@
 from google.appengine.api import users
 
 operations = [
-	"listclubs",
+	"listClubs",
 	"createClub"
 ]
 
@@ -40,13 +40,33 @@ actOperatoins = [
 	"edit",
 	"join"
 ]
+class AccessUser:
+	def __init__(self, user):
+		self.user = user
+	def can(self, operation, *args):
+		checker = getattr(self, "can_" + operation)
+		if (not checker or not callable(checker)):
+			return False
+		else:
+			return checker(*args)
+class SystemUser(AccessUser):
+	def can_listClubs(self, *args):
+		return True
+	def can_createClub(self, *args):
+		return users.is_current_user_admin()
+	
+class ClubUser(AccessUser):
+	def __init__(self, user, club):
+		super(ClubUser, self).__init__(user)
+		self.club = club
+	
+def isAccessible (user, operation, *args):
+	auobj = SystemUser(user)
+	return auobj.can(operation, *args)
 
-def isAccessible (user, operation, target = None):
+def hasClubPrivilige (user, club, operation, *args):
 	return True
 
-def hasClubPrivilige (user, club, operation, target = None):
-	return True
-
-def hasActPrivilige (user, act, operation, target = None):
+def hasActPrivilige (user, act, operation, *args):
 	return True
 

@@ -38,12 +38,14 @@ class ClubList(webapp.RequestHandler):
 		self.template = template
 
 	def get(self, *args):
-		if (isAccessible('', 'listclubs')):
+		if (isAccessible('', 'listClubs')):
 			clubs = Club.all()
-			nowdt = datetime.now()
-			newslug = "newclb_%d%d%d%d%d%d%d" % (nowdt.year, nowdt.month, nowdt.day, nowdt.hour, nowdt.minute, nowdt.second, nowdt.microsecond)
-			vars = dict (clubs=Club.all(), cluburl=viewurlconf.path('')[:-1], 
-						newcluburl = editurlconf.path(newslug) )
+			vars = dict (clubs=Club.all(), cluburl=viewurlconf.path('')[:-1])
+			if (isAccessible('', 'createClub')):
+				nowdt = datetime.now()
+				newslug = "newclb_%d%d%d%d%d%d%d" % (nowdt.year, nowdt.month, nowdt.day, nowdt.hour, nowdt.minute, nowdt.second, nowdt.microsecond)
+				newcluburl = editurlconf.path(newslug) 
+				vars['newcluburl'] = newcluburl
 			self.response.out.write (render(self.template, vars) )
 		else:
 			errorPage("Not Accessible", users.create_login_url(self.request.uri), self.response)
