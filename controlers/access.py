@@ -47,8 +47,12 @@ class AccessUser(object):
 	def can(self, operation, *args):
 		self.currentCheck = operation
 		methodName = "can_" + operation
+		defaultCheckerName = "defaultChecker"
 		if ( not hasattr(self, methodName) ) :
-			return False						
+			if (hasattr(self, defaultCheckerName)):
+				methodName = defaultCheckerName
+			else:
+				return False						
 		checker = getattr(self, methodName)
 		if (not checker or not callable(checker)):
 			return False
@@ -72,27 +76,22 @@ class ClubUser(AccessUser):
 		super(ClubUser, self).__init__(user)
 		self.club = club
 		self.member = Membership.between(user, club)
+	def isClubOwner(self):
+		return self.user == self.club.owner
+	def hasMemberPrivilige(self, *args):
+		member = self.member
+		if (member):
+			return self.currentCheck in member.privilige
+		else:
+			return False
 	def can_view(self, *args):
 		if (self.club.isPublic) :
 			return True
 		elif (self.member):
 			return True
 		return False
-	def can_edit(self, *args):
-		if (self.user == self.club.owner) :
-			return True
-		member = self.member
-		if (member):
-			return self.currentCheck in member.privilige
-		return False
-	def can_delete(self, *args):
-		return True
-	def can_arrange(self, *args):
-		return True
-	def can_finish(self, *args):
-		return True
-	def can_newAct(self, *args):
-		return True
+	def defaultChecker(self, *args):
+		return self.isClubOwner() or self.hasMemberPrivilige()
 	
 def isAccessible (user, operation, *args):
 	auobj = SystemUser(user)
