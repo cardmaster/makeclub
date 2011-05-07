@@ -19,6 +19,7 @@
  
 '''
 from google.appengine.api import users
+from models import Club, conf
 
 operations = [
 	"listClubs",
@@ -40,11 +41,14 @@ actOperatoins = [
 	"edit",
 	"join"
 ]
-class AccessUser:
+class AccessUser(object):
 	def __init__(self, user):
 		self.user = user
 	def can(self, operation, *args):
-		checker = getattr(self, "can_" + operation)
+		methodName = "can_" + operation
+		if ( not hasattr(self, methodName) ) :
+			return false						
+		checker = getattr(self, methodName)
 		if (not checker or not callable(checker)):
 			return False
 		else:
@@ -53,19 +57,36 @@ class SystemUser(AccessUser):
 	def can_listClubs(self, *args):
 		return True
 	def can_createClub(self, *args):
-		return users.is_current_user_admin()
+		cq = Club.all()
+		cq.filter('owner =', self.user)
+		return cq.count() < conf.MaxClubsPerUser
 	
 class ClubUser(AccessUser):
 	def __init__(self, user, club):
 		super(ClubUser, self).__init__(user)
 		self.club = club
+	def can_view(self, *args):
+		return True
+	def can_create(self, *args):
+		return True
+	def can_edit(self, *args):
+		return True
+	def can_delete(self, *args):
+		return True
+	def can_arrange(self, *args):
+		return True
+	def can_finish(self, *args):
+		return True
+	def can_newAct(self, *args):
+		return True
 	
 def isAccessible (user, operation, *args):
 	auobj = SystemUser(user)
 	return auobj.can(operation, *args)
 
 def hasClubPrivilige (user, club, operation, *args):
-	return True
+	auobj = ClubUser(user, club)
+	return auobj.can(operation, *args)
 
 def hasActPrivilige (user, act, operation, *args):
 	return True

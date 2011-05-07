@@ -27,6 +27,7 @@ class Club(db.Model):
 	name = db.StringProperty(multiline=False)
 	fund = MoneyProperty()
 	intro = db.StringProperty(multiline=True)
+	isPublic = db.BooleanProperty(required=True, default=True)
 	@staticmethod
 	def getClubBySlug(slug):
 		q = Club.all()

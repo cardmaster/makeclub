@@ -18,7 +18,13 @@
  
  
 '''
-from membership import Membership
-from club import Club
-from activity import Activity, ActivityParticipator
-from conf import conf
+
+'''
+This is the global config for our little app
+'''
+
+class Conf:
+	def __init__(self):
+		self.MaxClubsPerUser = 3
+		
+conf = Conf()
