@@ -48,5 +48,10 @@ class Membership(db.Model):
 		if (oldms):
 			oldms.copy(self)
 			entry = oldms
+		#When the nickname & email keep empty, will load infor form the user object
+		if (not entry.name):
+			entry.name = entry.user.nickname()
+		if (not entry.email):
+			entry.email = entry.user.email()
 		return db.Model.put (entry)
 		
