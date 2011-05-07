@@ -23,7 +23,8 @@ from models import Club, conf, Membership, ActivityParticipator
 
 operations = [
 	"listClubs",
-	"createClub"
+	"createClub",
+	"deleteClub"
 ]
 
 clubOperations = [

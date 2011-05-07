@@ -21,7 +21,7 @@
 from google.appengine.api import users
 from google.appengine.ext import webapp
 
-from models import Club
+from models import Club, Membership
 from template import render
 from errors import errorPage
 from access import hasClubPrivilige, isAccessible
@@ -107,7 +107,11 @@ class ClubEdit(webapp.RequestHandler):
 		if (clubmd): #Put valid, then redirect
 			if ( self.editOrCreateRight(user, clubmd) ):
 				self.clubmodel = clubmd
+				isNewClub = not clubmd.is_saved()
 				clubmd.put()
+				if (isNewClub): #Create New Membership For Owner when create the club
+					mem = Membership(user=user, club = clubmd)
+					mem.put()
 				errorPage ("Successfullyt Saved Club", urldict['ClubView'].path(clubmd.slug), self.response, 200)
 			else:
 				return
