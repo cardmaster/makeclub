@@ -19,7 +19,7 @@
  
 '''
 from google.appengine.api import users
-from models import Club, conf
+from models import Club, conf, Membership
 
 operations = [
 	"listClubs",
@@ -28,7 +28,6 @@ operations = [
 
 clubOperations = [
 	"view",
-	"create",
 	"edit",
 	"delete",
 	"arrange",
@@ -44,10 +43,12 @@ actOperatoins = [
 class AccessUser(object):
 	def __init__(self, user):
 		self.user = user
+		self.currentCheck = None
 	def can(self, operation, *args):
+		self.currentCheck = operation
 		methodName = "can_" + operation
 		if ( not hasattr(self, methodName) ) :
-			return false						
+			return False						
 		checker = getattr(self, methodName)
 		if (not checker or not callable(checker)):
 			return False
@@ -59,18 +60,31 @@ class SystemUser(AccessUser):
 	def can_createClub(self, *args):
 		cq = Club.all()
 		cq.filter('owner =', self.user)
-		return cq.count() < conf.MaxClubsPerUser
+		if (cq.count() < conf.MaxClubsPerUser):
+			return True
+		elif ( users.is_current_user_admin() and self.user == users.get_current_user()):
+			return True
+		else:
+			return False
 	
 class ClubUser(AccessUser):
 	def __init__(self, user, club):
 		super(ClubUser, self).__init__(user)
 		self.club = club
+		self.member = Membership.between(user, club)
 	def can_view(self, *args):
-		return True
-	def can_create(self, *args):
-		return True
+		if (self.club.isPublic) :
+			return True
+		elif (self.member):
+			return True
+		return False
 	def can_edit(self, *args):
-		return True
+		if (self.user == self.club.owner) :
+			return True
+		member = self.member
+		if (member):
+			return self.currentCheck in member.privilige
+		return False
 	def can_delete(self, *args):
 		return True
 	def can_arrange(self, *args):

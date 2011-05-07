@@ -23,7 +23,7 @@ from properties import MoneyProperty
 
 class Club(db.Model):
 	slug = db.StringProperty(multiline=False, required=True, indexed=True, default="new_club_slug")
-	owner = db.UserProperty()
+	owner = db.UserProperty(auto_current_user = True)
 	name = db.StringProperty(multiline=False)
 	fund = MoneyProperty()
 	intro = db.StringProperty(multiline=True)

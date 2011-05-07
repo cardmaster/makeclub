@@ -56,7 +56,7 @@ class ActivityBase(webapp.RequestHandler):
 			return False
 		if (not hasActPrivilige(user, self.actobj, self.actOperation)):
 			errorPage ("Not authorrized", 
-					urldict['ClubVew'].getPath(self.actobj.club.slug), 
+					urldict['ClubView'].path(self.actobj.club.slug), 
 					self.response, 403)
 			return False
 		return True
@@ -250,6 +250,6 @@ class ActivityNew(ActivityEdit):
 			errorPage ("Not login", create_login_url(self.request.url), self.response, 403)
 			return False
 		if (not hasClubPrivilige(user, self.actobj.club, "newact")):
-			errorPage ("Not Authorized to edit", urldict['ClubVew'].getPath(self.actobj.club.slug), self.response, 403)
+			errorPage ("Not Authorized to edit", urldict['ClubView'].path(self.actobj.club.slug), self.response, 403)
 			return False
 		return True
