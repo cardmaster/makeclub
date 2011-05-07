@@ -28,12 +28,14 @@ class Membership(db.Model):
 	name = db.StringProperty(multiline=False) #Name display in this club
 	balance = MoneyProperty()
 	email = db.EmailProperty()
+	privilige = db.StringListProperty(default=["view", "join"])
 	def copy(self, oth):
 		self.user = oth.user
 		self.club = oth.club
 		self.name = oth.name
 		self.balance = oth.balance
 		self.email = oth.email
+		self.privilige = oth.privilige
 	@staticmethod
 	def between(user, club):
 		q = Membership.all()

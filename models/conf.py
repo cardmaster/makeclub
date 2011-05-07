@@ -18,28 +18,13 @@
  
  
 '''
-from google.appengine.ext import db
-from properties import MoneyProperty
 
-class Club(db.Model):
-	slug = db.StringProperty(multiline=False, required=True, indexed=True, default="new_club_slug")
-	owner = db.UserProperty(auto_current_user = True)
-	name = db.StringProperty(multiline=False)
-	fund = MoneyProperty()
-	intro = db.StringProperty(multiline=True)
-	isPublic = db.BooleanProperty(required=True, default=True)
-	@staticmethod
-	def getClubBySlug(slug):
-		q = Club.all()
-		q.filter("slug =", slug)
-		return q.get()
+'''
+This is the global config for our little app
+'''
 
-	@staticmethod
-	def getClub(slug):
-		ret = Club.getClubBySlug(slug)
-		if (ret):
-			return ret
-		else:
-			return Club(slug=slug)
+class Conf:
+	def __init__(self):
+		self.MaxClubsPerUser = 3
 		
-
+conf = Conf()

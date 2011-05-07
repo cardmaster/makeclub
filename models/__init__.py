@@ -21,3 +21,4 @@
 from membership import Membership
 from club import Club
 from activity import Activity, ActivityParticipator
+from conf import conf

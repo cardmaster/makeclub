@@ -62,8 +62,8 @@ class ClubEdit(webapp.RequestHandler):
 		return slug
 
 	def editOrCreateRight(self, user, club):
-		if ( (club.is_saved() and isAccessible (user, "createClub"))  #Create
-				or (hasClubPrivilige(user, club, "edit")) ): #Edit
+		if ( (not club.is_saved() and isAccessible (user, "createClub"))  #Create
+				or (club.is_saved() and hasClubPrivilige(user, club, "edit")) ): #Edit
 			return True
 		else:
 			errorPage("Access Deny For club", users.create_login_url(self.request.uri), self.response)#Access Deny

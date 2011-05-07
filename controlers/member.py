@@ -88,7 +88,7 @@ class Member(webapp.RequestHandler):
 		return (self.request.get('delete', '') == "True")
 	
 	def doDelete(self):
-		if (hasClubPrivilige(self.user, self.club, 'deleteMember:'+self.targetUser.email() )):
+		if (hasClubPrivilige(self.user, self.club, 'deleteMember', self.targetUser.email() )):
 			member = self.member
 			if (member):
 				return member.delete()
@@ -119,7 +119,7 @@ class Member(webapp.RequestHandler):
 		else:
 			pathuser = user
 		#@warning: I don't know is it correct to add access control code here
-		if (not hasClubPrivilige(user, club, 'membership:' + pathuser.email())):
+		if (not hasClubPrivilige(user, club, 'membership', pathuser.email())):
 			return errorPage ("Can not access", '/', self.response, 403)
 		self.user = user
 		self.club = club

@@ -74,6 +74,11 @@ class ActivityParticipator(db.Model):
 			self.confirmed = oth.confirmed
 	@staticmethod
 	def between(mem, act):
+		if (not isinstance(mem, Membership)): #Will be use as user
+			user = mem
+			mem = Membership.between(user, act.club)
+		if (not mem):
+			return None
 		q = ActivityParticipator.all()
 		q.filter('member = ', mem).filter('activity = ', act)
 		return q.get()
