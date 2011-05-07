@@ -19,7 +19,7 @@
  
 '''
 from google.appengine.api import users
-from models import Club, conf, Membership
+from models import Club, conf, Membership, ActivityParticipator
 
 operations = [
 	"listClubs",
@@ -30,15 +30,21 @@ clubOperations = [
 	"view",
 	"edit",
 	"delete",
+	"join",
+	"membership", #For edit memebership or create a membership
 	"arrange",
 	"finish",
-	"newact"
+	"newact",
+	"quit"
 ]
 
 actOperatoins = [
 	"view",
 	"edit",
-	"join"
+	"join",
+	"confirm",
+	"bill",
+	"quit"
 ]
 class AccessUser(object):
 	def __init__(self, user):
@@ -90,8 +96,49 @@ class ClubUser(AccessUser):
 		elif (self.member):
 			return True
 		return False
+	def can_join(self, *args):
+		return (self.club.isPublic) 
+	def can_membership(self, *args):
+		(target, ) = args
+		if (self.user.email() == target): 
+			if (self.member): #This is edit own membership
+				return True
+			else:#This would be consider as a join situation
+				return self.can("join")
+		else: #Consitor as membership
+			return self.defaultChecker()
 	def defaultChecker(self, *args):
 		return self.isClubOwner() or self.hasMemberPrivilige()
+
+'''
+Activity Has 4 operations, every member ship of current club could
+view this activity's information, and every member could join this act
+but ONLY the organizer could confirm a member's join
+And send the bill to everybody, by default, the bill's amout will calculated
+by the time duration of a participator
+'''
+class ActivityUser(AccessUser):
+	def __init__(self, user, act):
+		super(ActivityUser, self).__init__(user)
+		self.act = act
+	def isUserOrganizer(self):
+		return self.act.organizer == self.user
+	def isUserClubMember(self):
+		return Membership.between(self.user, self.act.club)
+	def can_view(self, *args):
+		#Every body can view an activity
+		return True
+	def can_quit(self, *args):
+		parti = ActivityParticipator.between(self.user, self.act)
+		if (parti):
+			return not parti.confirmed
+		return False
+	def defaultChecker(self, *args):
+		organizerOnly = ["edit", "confirm", "bill"]
+		if (self.currentCheck in organizerOnly):
+			return self.isUserOrganizer()
+		else:
+			return self.isUserClubMember()
 	
 def isAccessible (user, operation, *args):
 	auobj = SystemUser(user)
@@ -102,5 +149,6 @@ def hasClubPrivilige (user, club, operation, *args):
 	return auobj.can(operation, *args)
 
 def hasActPrivilige (user, act, operation, *args):
-	return True
+	auobj = ActivityUser(user, act)
+	return auobj.can(operation, *args)
 
