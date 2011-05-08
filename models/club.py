@@ -25,7 +25,7 @@ class Club(db.Model):
 	slug = db.StringProperty(multiline=False, required=True, indexed=True, default="new_club_slug")
 	owner = db.UserProperty(auto_current_user = True)
 	name = db.StringProperty(multiline=False)
-	fund = MoneyProperty()
+	fund = MoneyProperty(default="0.0")
 	intro = db.StringProperty(multiline=True)
 	isPublic = db.BooleanProperty(required=True, default=True)
 	@staticmethod
