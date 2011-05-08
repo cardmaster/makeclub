@@ -73,8 +73,11 @@ class ActivityBase(webapp.RequestHandler):
 			return errorPage("No such Activity", urldict['ClubList'].path(), self.response, 404)
 
 class SpecialOp:
-	def __init__(self, oper = '', url = '', needPost = False, data = [] ):
+	def __init__(self, oper = '', url = '', needPost = False, data = [], display = ''):
 		self.oper = oper
+		if (not display):
+			display = oper
+		self.display = display
 		self.url = url
 		self.needPost = needPost
 		self.data = data
