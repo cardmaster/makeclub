@@ -8,9 +8,12 @@ sub dbg
 	print "#DBG", join (' ', @_), "\n" if $dbgOn;
 }
 
-my $func = 'errorPage'; #Function Name
-my $oldpos = 2; #Param position before swap
-my $newpos = 0; #Param position after swap
+my ($func, $oldpos, $newpos) = @ARGV;
+
+unless (defined $func and defined $oldpos and defined $newpos) {
+	print "Usage: scritp functionname oldpos newpos\n";
+	exit 0;
+}
 
 my $funcbegin = 0;
 my $funccall = '';
