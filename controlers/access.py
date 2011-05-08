@@ -137,10 +137,18 @@ class ActivityUser(AccessUser):
 		return False
 	def defaultChecker(self, *args):
 		organizerOnly = ["edit", "confirm", "bill"]
-		if (self.currentCheck in organizerOnly):
-			return self.isUserOrganizer()
-		else:
-			return self.isUserClubMember()
+		selfOnly = ["confirm"]
+		memberOnly = ["view", "join"]
+		target = None
+		if (args):
+			(target, ) = args
+		if ((self.currentCheck in memberOnly) and self.isUserClubMember()):
+			return True
+		if ((self.currentCheck in selfOnly) and target == self.user):
+			return True
+		if ( (self.currentCheck in organizerOnly) and self.isUserOrganizer()):
+			return True
+		return False
 	
 def isAccessible (user, operation, *args):
 	auobj = SystemUser(user)
