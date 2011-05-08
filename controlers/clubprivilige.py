@@ -35,7 +35,7 @@ class ClubPrivilige(webapp.RequestHandler):
 		self.template = template
 	def get(self, *args):
 		if (self.initRequest()):
-			currentPriv = ['newAct', 'view']
+			currentPriv = self.target.privilige
 			tempvars = dict (membership = self.target, 
 							operator = self.user, 
 							operations = clubOperations,
@@ -44,7 +44,15 @@ class ClubPrivilige(webapp.RequestHandler):
 		
 	def post(self, *args):
 		if (self.initRequest()):
-			print self.request
+			getval = self.request.get
+			getlist = self.request.get_all
+			privs = getlist('priv')
+			member = self.target
+			member.privilige = privs
+			member.put()
+			infoPage(self.response, "Success", "Success fully enable grant user %s in club %s those privilige: \n (%s)"
+					% (self.target.name, self.target.club.name, ', '.join(privs)), self.request.path )
+			
 	def initRequest(self):
 		urlconf = urldict[type(self).__name__]
 		slug, useremail = urlconf.analyze(self.request.path)

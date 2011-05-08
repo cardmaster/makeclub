@@ -1,7 +1,10 @@
 
+<div class="header">
+Set privilige for member {{ membership.name }}&lt;<a href="mailto:{{membership.email}}">{{membership.email}}</a>&gt; of club {{membership.club.name}}
+</div>
 <form name="clubpriv" method="post" action="">
 <div class="selectBox">
-<select multiple="multiple" size="5">
+<select multiple="multiple" name ="priv" size="5">
 {% for op in operations %}
 <option {% if op in currentPriv %}selected="selected"{% endif %}>{{ op }}</option>
 {% endfor %}
