@@ -1,68 +1,62 @@
-<html>
-	<head>
-		<title>Club View</title>
-	</head>
-	<body>
-		<div id="pageContainer">
-		<div class="clubNameLine">
+<div id="pageContainer">
+	<div class="clubNameLine">
 		{{ club.name }}
-		</div>
-		<div class="clubIntroLine">
+	</div>
+	<div class="clubIntroLine">
 		<p>This club is Create By {{ club.owner }}</p>
 		{% if editurl %}
 		<p>You can <a href="{{ editurl }}" alt="Edit Club" class="clubOperation">Edit This Club</a></p>
 		{% endif %}
 		<p>{{ club.intro }}</p>
-		</div>
-		<div class="applyClub">
+	</div>
+	<div class="applyClub">
 		{% if membership %}
 		<div class="yourMembership">
-		You are member of this club ({{membership.name}}&lt;<a href="mailto:{{ membership.email }}">{{ membership.email }}</a>&gt;). 
-		balance: <span class="userbalance">{{ membership.balance }}</span>
-		| <a href="/member/{{ club.slug }}">Edit My Member Ship</a>  
+			You are member of this club ({{membership.name}}&lt;<a href="mailto:{{ membership.email }}">{{ membership.email }}</a>&gt;). 
+			balance: <span class="userbalance">{{ membership.balance }}</span>
+			| <a href="/member/{{ club.slug }}">Edit My Member Ship</a>  
 		</div>
 		{% else %}
-			{% if userName %}
+		{% if userName %}
 		<form name="applyClub" method="post" action="{{ action }}">
-		<div class="applyInfo">
-		<span class="inputPropmt namePrompt">Name In Club: </span><input type="text" name="name" text="{{ userName }}" />
-		<span class="inputPropmt namePrompt">Email In Club: </span><input type="text" name="email" text="{{ userEmail }}" />
-		<input class="submit" type="submit" value="Join This Club" />
-		</div>
+			<div class="applyInfo">
+				<span class="inputPropmt namePrompt">Name In Club: </span><input type="text" name="name" text="{{ userName }}" />
+				<span class="inputPropmt namePrompt">Email In Club: </span><input type="text" name="email" text="{{ userEmail }}" />
+				<input class="submit" type="submit" value="Join This Club" />
+			</div>
 		</form>
-			{% else %}
+		{% else %}
 		Please <a alt="click to login" href="{{ loginUrl }}">log in</a> before join this club.
-			{% endif %}
 		{% endif %}
-		</div>
-		{% if newAct %}
-		<div class="clubOperations"> 
-			<a href="{{ newAct }}" >Create New Activity</a>
-		</div>
 		{% endif %}
-		<div class="listContainer">
-			<div class="clubMemebersHeader">
+	</div>
+	{% if newAct %}
+	<div class="clubOperations"> 
+		<a href="{{ newAct }}" >Create New Activity</a>
+	</div>
+	{% endif %}
+	<div class="listContainer">
+		<div class="clubMemebersHeader">
 			Members of Club {{ club.name }}
-			</div>
-			<div class="clubMemeberListArea">
-			<ul>
-			{% for member in members %}
-			   <li>{{ member.user }}, {{ member.name }}</li>
-			{% endfor %}
-			</ul>
-			</div>
 		</div>
-		<div class="listContainer">
-			<div class="listHeader">
+		<div class="clubMemeberListArea">
+			<ul>
+				{% for member in members %}
+				<li>{{ member.user }}, {{ member.name }}</li>
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
+	<div class="listContainer">
+		<div class="listHeader">
 			Activities of Club {{ club.name }}
-			</div>
-			<div class="listArea">
-			<ul>
-			{% for act in acts %}
-			   <li><a href="{{ act.linkpath }}">{{ act.name }}</a>, {{ act.startTime }} duration {{ act.duration }} hours</li>
-			{% endfor %}
-			</ul>
-			</div>
 		</div>
-	</body>
-</html>
+		<div class="listArea">
+			<ul>
+				{% for act in acts %}
+				<li><a href="{{ act.linkpath }}">{{ act.name }}</a>, {{ act.startTime }} duration {{ act.duration }} hours</li>
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
+
