@@ -76,6 +76,8 @@ class ClubView(webapp.RequestHandler):
 				templatevars['loginUrl'] = users.create_login_url(self.request.uri)
 			if (membership and hasClubPrivilige(user, club, 'newAct')):
 				templatevars['newAct'] = urldict['ActivityNew'].path(slug)
+			if (hasClubPrivilige(user, club, "edit")):
+				templatevars['editurl'] = urldict['ClubEdit'].path(club.slug)
 			mq = Membership.all()
 			mq.filter ('club = ', club)
 			templatevars['members'] = mq

@@ -9,6 +9,9 @@
 		</div>
 		<div class="clubIntroLine">
 		<p>This club is Create By {{ club.owner }}</p>
+		{% if editurl %}
+		<p>You can <a href="{{ editurl }}" alt="Edit Club" class="clubOperation">Edit This Club</a></p>
+		{% endif %}
 		<p>{{ club.intro }}</p>
 		</div>
 		<div class="applyClub">
