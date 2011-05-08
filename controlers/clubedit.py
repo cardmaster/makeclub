@@ -49,7 +49,7 @@ class ClubEdit(webapp.RequestHandler):
 			templateValues['enablefinanace'] = True
 		if (clubmodel.is_saved()):
 			templateValues['oldslug'] = clubmodel.slug
-		self.response.out.write (render(self.template, templateValues) )
+		self.response.out.write (render(self.template, templateValues, self.request.url) )
 
 	def makeClubModel(self, slug=''):
 		if (not slug):

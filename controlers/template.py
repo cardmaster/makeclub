@@ -38,7 +38,7 @@ def render(tempname, dict, currentUrl = '/', createLogInOutUrl = True):
 	if ('pageTitle' not in dict):
 		dict['pageTitle'] = tempname[:tempname.rindex('.')]
 	if (createLogInOutUrl):
-		addLogInOutUrl('/', dict)
+		addLogInOutUrl(currentUrl, dict)
 #	templateFile = os.path.join (templateFolder(), templateSet(), tempname)
 	return template.render(pageFrame, dict)
 	

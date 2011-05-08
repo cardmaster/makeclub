@@ -48,7 +48,7 @@ class ActivityBase(webapp.RequestHandler):
 		return templateVars
 	def makeResponseText(self, act):
 		templateVars = self.templateParams()
-		return render(self.template, templateVars)
+		return render(self.template, templateVars, self.request.url)
 	def checkPrivilige(self):
 		user = get_current_user()
 		if (not user):

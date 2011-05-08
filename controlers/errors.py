@@ -23,7 +23,7 @@ from template import render
 tplt = 'errors.html'
 def renderErrorPage(msg, redirect=''):
 	vars = dict(message=msg, redirect=redirect)
-	return render(tplt, vars)
+	return render(tplt, vars, redirect)
 
 def errorPage(msg, redirect, response, status = 404):
 	response.set_status(status)

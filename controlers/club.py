@@ -47,7 +47,7 @@ class ClubList(webapp.RequestHandler):
 				newslug = "newclb_%d%d%d%d%d%d%d" % (nowdt.year, nowdt.month, nowdt.day, nowdt.hour, nowdt.minute, nowdt.second, nowdt.microsecond)
 				newcluburl = editurlconf.path(newslug) 
 				vars['newcluburl'] = newcluburl
-			self.response.out.write (render(self.template, vars) )
+			self.response.out.write (render(self.template, vars, self.request.url) )
 		else:
 			errorPage("Not Accessible", users.create_login_url(self.request.uri), self.response)
 
@@ -89,7 +89,7 @@ class ClubView(webapp.RequestHandler):
 				act.linkpath = avpath (act.key().id())
 				actlist.append (act)
 			templatevars['acts'] = actlist
-			self.response.out.write (render(self.template, templatevars) )
+			self.response.out.write (render(self.template, templatevars, self.request.url) )
 		else:
 			self.response.set_status(404)
 			errorPage("Club Not Found", listurlconf.path(), self.response)

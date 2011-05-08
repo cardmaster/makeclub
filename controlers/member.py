@@ -83,7 +83,7 @@ class Member(webapp.RequestHandler):
 						postStatus = self.postStatus,
 						enableFinace = hasClubPrivilige(users.get_current_user(), club, "finance" )
 			)
-			self.response.out.write (render(self.template, tempvars))
+			self.response.out.write (render(self.template, tempvars, self.request.url))
 	
 	def judgeDelete(self):
 		return (self.request.get('delete', '') == "True")

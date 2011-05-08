@@ -28,7 +28,7 @@ class UserList(webapp.RequestHandler):
 		self.template = template
 
 	def get(self):
-		self.response.out.write (render(self.template, locals()) )
+		self.response.out.write (render(self.template, locals(), self.request.url) )
 
 class UserView(webapp.RequestHandler):
 	def __init__(self, 
@@ -37,5 +37,5 @@ class UserView(webapp.RequestHandler):
 		self.template = template
 
 	def get(self):
-		self.response.out.write (render(self.template, locals()) )
+		self.response.out.write (render(self.template, locals(), self.request.url) )
 
