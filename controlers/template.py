@@ -32,6 +32,8 @@ def templateSet():
 	return 'default'
 
 def render(tempname, dict):
-	templateFile = os.path.join (templateFolder(), templateSet(), tempname)
-	return template.render(templateFile, dict)
+	pageFrame = os.path.join(templateFolder(), templateSet(), "pageframe.html")
+	dict['bodyTemplate'] = tempname
+#	templateFile = os.path.join (templateFolder(), templateSet(), tempname)
+	return template.render(pageFrame, dict)
 	
