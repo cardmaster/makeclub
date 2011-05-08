@@ -29,6 +29,6 @@ class ClubPrivilige(webapp.RequestHandler):
 		template='clubpriv.html', *args, **kw ):
 		self.template = template
 	def get(self, *args):
-		pass
+		print args
 	def post(self, *args):
-		pass
+		print args

@@ -64,18 +64,21 @@ class ModuleUrlConf(object):
 
 from helper import splitPath
 class MemberUrlConf(ModuleUrlConf):
+	def __init__(self, stub):
+		super(MemberUrlConf, self).__init__(stub + '/%s/%s', stub + '/.*')
+		self.stub = stub
 	def path(self, slug, user=''):
 		return ModuleUrlConf.path(self, slug, user)
 	def analyze(self, path):
-		result = splitPath(path, '/member', 2)
+		result = splitPath(path, self.stub, 2)
 		return result
 
 urldict = dict (
 	ClubList = ModuleUrlConf('/clubs', extPattern('(/$|/clubs)') ),
 	ClubView = ModuleUrlConf('/club/%s', '/club/(\S+)/?$'),
 	ClubEdit = ModuleUrlConf('/club/%s/edit', '/club/(\S+)/edit/?$'),
-	Member   = MemberUrlConf('/member/%s/%s', '/member/.*'),
-	ClubPrivilige   = MemberUrlConf('/priv/%s/%s', '/priv/.*'),
+	Member   = MemberUrlConf('/member'),
+	ClubPrivilige   = MemberUrlConf('/priv'),
 	ActivityView = ModuleUrlConf('/act/id/%s', '/act/id/(\d+)/?$'),
 	ActivityEdit = ModuleUrlConf('/act/id/%s/edit', '/act/id/(\d+)/edit/?$'),
 	ActivityParticipate = ModuleUrlConf('/act/id/%s/%s', '/act/id/(\d+)/(join|quit|confirm|bill)/?$'),
