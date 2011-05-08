@@ -80,7 +80,8 @@ class Member(webapp.RequestHandler):
 						member = self.getMember(),
 						club   = self.club,
 						cluburl= cvurlconf.path(club.slug),
-						postStatus = self.postStatus
+						postStatus = self.postStatus,
+						enableFinace = hasClubPrivilige(users.get_current_user(), club, "finance" )
 			)
 			self.response.out.write (render(self.template, tempvars))
 	
@@ -144,7 +145,7 @@ class Member(webapp.RequestHandler):
 			member.email = getval('email', '')
 		elif (not member.email):
 			member.email = self.user.email()	
-		if (balance):
+		if (balance and hasClubPrivilige(users.get_current_user(), member.club, "finance" )):
 			member.balance = balance
 		return member
 		

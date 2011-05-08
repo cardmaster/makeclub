@@ -33,6 +33,7 @@ clubOperations = [
 	"delete",
 	"join",
 	"membership", #For edit memebership or create a membership
+	"finance", #Could manage club balance and member's balance
 	"arrange",
 	"finish",
 	"newact",

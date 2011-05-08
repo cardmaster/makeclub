@@ -45,6 +45,8 @@ class ClubEdit(webapp.RequestHandler):
 
 	def responseClub(self, clubmodel, nickname):
 		templateValues = dict(action=self.request.path, username=nickname, model=clubmodel)
+		if (hasClubPrivilige(users.get_current_user(), clubmd, "finanace" )):
+			templateValues['enablefinanace'] = True
 		if (clubmodel.is_saved()):
 			templateValues['oldslug'] = clubmodel.slug
 		self.response.out.write (render(self.template, templateValues) )
@@ -94,9 +96,11 @@ class ClubEdit(webapp.RequestHandler):
 			clubmd = self.makeClubModel(oldslug)
 		else:        #Create new model
 			clubmd = self.makeClubModel(slug)
+		clubmd.owner = owner
 		clubmd.slug = slug
 		clubmd.name = name
-		clubmd.fund = fund
+		if (hasClubPrivilige(users.get_current_user(), clubmd, "finanace" )):
+			clubmd.fund = fund
 		clubmd.intro = intro
 		return clubmd
 
