@@ -49,7 +49,7 @@ class ClubList(webapp.RequestHandler):
 				vars['newcluburl'] = newcluburl
 			self.response.out.write (render(self.template, vars, self.request.url) )
 		else:
-			errorPage("Not Accessible", users.create_login_url(self.request.uri), self.response)
+			errorPage( self.response,  "Not Accessible",   users.create_login_url(self.request.uri))
 
 class ClubView(webapp.RequestHandler):
 	def __init__(self, 
@@ -80,7 +80,12 @@ class ClubView(webapp.RequestHandler):
 				templatevars['editurl'] = urldict['ClubEdit'].path(club.slug)
 			mq = Membership.all()
 			mq.filter ('club = ', club)
-			templatevars['members'] = mq
+			memset = []
+			for mem in mq:
+				if (hasClubPrivilige(user, club, "privGrant")):
+					mem.privEdit = urldict['ClubPrivilige'].path(slug, mem.user.email())
+				memset.append(mem)
+			templatevars['members'] = memset
 			aq = Activity.all()
 			aq.filter ('club = ', club)
 			avpath = urldict['ActivityView'].path
@@ -92,6 +97,6 @@ class ClubView(webapp.RequestHandler):
 			self.response.out.write (render(self.template, templatevars, self.request.url) )
 		else:
 			self.response.set_status(404)
-			errorPage("Club Not Found", listurlconf.path(), self.response)
+			errorPage( self.response,  "Club Not Found",   listurlconf.path())
 			
 

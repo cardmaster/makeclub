@@ -37,7 +37,8 @@ clubOperations = [
 	"arrange",
 	"finish",
 	"newAct",
-	"quit"
+	"quit",
+	"privGrant"
 ]
 
 actOperatoins = [
@@ -62,7 +63,7 @@ class AccessUser(object):
 			if (hasattr(self, defaultCheckerName)):
 				methodName = defaultCheckerName
 			else:
-				return False						
+				return False
 		checker = getattr(self, methodName)
 		if (not checker or not callable(checker)):
 			return False

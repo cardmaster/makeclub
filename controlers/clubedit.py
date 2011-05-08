@@ -24,6 +24,7 @@ from google.appengine.ext import webapp
 from models import Club, Membership
 from template import render
 from errors import errorPage
+from infopage import infoPage
 from access import hasClubPrivilige, isAccessible
 from helper import splitPath
 from url import urldict
@@ -68,13 +69,13 @@ class ClubEdit(webapp.RequestHandler):
 				or (club.is_saved() and hasClubPrivilige(user, club, "edit")) ): #Edit
 			return True
 		else:
-			errorPage("Access Deny For club", users.create_login_url(self.request.uri), self.response)#Access Deny
+			errorPage( self.response,  "Access Deny For club",   users.create_login_url(self.request.uri))#Access Deny
 			return False
 
 	def get(self, *args):
 		stat, user = self.accessControl()
 		if (not stat):
-			return errorPage("Not Log in", user, self.response)
+			return errorPage( self.response,   "User %s Not Log in" % user,  users.create_login_url(self.request.uri))
 		if (self.clubmodel):
 			clubmd=self.clubmodel
 		else: 
@@ -118,7 +119,7 @@ class ClubEdit(webapp.RequestHandler):
 				if (isNewClub): #Create New Membership For Owner when create the club
 					mem = Membership(user=user, club = clubmd)
 					mem.put()
-				errorPage ("Successfullyt Saved Club", urldict['ClubView'].path(clubmd.slug), self.response, 200)
+				infoPage (self.response, "Successfullyt Saved Club", "Club Saved", urldict['ClubView'].path(clubmd.slug))
 			else:
 				return
 		else:

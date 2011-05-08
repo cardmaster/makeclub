@@ -26,3 +26,4 @@ from url import urldict
 from member import Member
 from test import Test
 from activity import ActivityView, ActivityEdit, ActivityParticipate, ActivityNew
+from clubprivilige import ClubPrivilige
