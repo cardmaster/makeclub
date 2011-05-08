@@ -37,7 +37,8 @@ clubOperations = [
 	"arrange",
 	"finish",
 	"newAct",
-	"quit"
+	"quit",
+	"privGrant"
 ]
 
 actOperatoins = [

@@ -42,7 +42,11 @@
 		<div class="clubMemeberListArea">
 			<ul>
 				{% for member in members %}
-				<li>{{ member.user }}, {{ member.name }}</li>
+				<li>{{ member.user }}, {{ member.name }} (Priviliges:{{member.privilige|join:', '}})
+				{% if member.privEdit %}
+				<a href="{{member.privEdit}}">Edit Priviliges</a>
+				{% endif %}
+				</li>
 				{% endfor %}
 			</ul>
 		</div>

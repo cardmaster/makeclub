@@ -80,7 +80,12 @@ class ClubView(webapp.RequestHandler):
 				templatevars['editurl'] = urldict['ClubEdit'].path(club.slug)
 			mq = Membership.all()
 			mq.filter ('club = ', club)
-			templatevars['members'] = mq
+			memset = []
+			for mem in mq:
+				if (hasClubPrivilige(user, club, "privGrant")):
+					mem.privEdit = urldict['ClubPrivilige'].path(slug, mem.user.email())
+				memset.append(mem)
+			templatevars['members'] = memset
 			aq = Activity.all()
 			aq.filter ('club = ', club)
 			avpath = urldict['ActivityView'].path
