@@ -1,18 +1,18 @@
 #!/usr/bin/perl -w
 use strict;
 
-my $dbgOn = 0;
+my ($func, $oldpos, $newpos, $dbgOn) = @ARGV;
+$dbgOn = 0 unless defined $dbgOn;
+
 sub splitParams;
 sub dbg
 {
-	print "#DBG", join (' ', @_), "\n" if $dbgOn;
+	print "#DBG", join (' ', @_), "\n" if $dbgOn eq 'dbg';
 }
 
-my ($func, $oldpos, $newpos) = @ARGV;
 
 unless (defined $func and defined $oldpos and defined $newpos) {
-	print "Usage: scritp functionname oldpos newpos\n";
-	exit 0;
+	die "NOT enough panarm, Usage: scritp functionname oldpos newpos\n";
 }
 
 my $funcbegin = 0;
