@@ -100,6 +100,13 @@ class ActivityView(ActivityBase):
 				sop = SpecialOp(oper, urlcfg.path(aid, oper), True, data)
 				specialOps.append(sop)
 		defaults['specialOps'] = specialOps
+		
+		participatorOps = []
+		for oper in ('confirm', 'quit'):
+			if (hasActPrivilige(user, self.actobj, oper) ):
+				sop = SpecialOp(oper, urlcfg.path(aid, oper), True, [])
+				participatorOps.append(sop)
+		defaults['participatorOps'] = participatorOps
 		apq = ActivityParticipator.all()
 		apq.filter ('activity = ', self.actobj)
 		defaults['participators'] = apq
@@ -137,10 +144,10 @@ class ActivityParticipate(webapp.RequestHandler):
 			targetUser = User(target)
 			if(not targetUser):
 				return errorPage ("Illegal access", cluburl, self.response, 403)
-		else:
+		else: #if target omitted, use current user as target
 			targetUser = user
 			
-		mem = Membership.between (user, actobj.club)
+		mem = Membership.between (targetUser, actobj.club)
 		if (not mem):
 			return errorPage ("Not a member", cluburl, self.response, 403)
 		
@@ -162,7 +169,7 @@ class ActivityParticipate(webapp.RequestHandler):
 		elif (oper == 'confirm'):
 			actp = ActivityParticipator.between(mem, actobj)
 			if (actp):
-				actp.confirmed = True
+				actp.confirmed = not actp.confirmed 
 				actp.put()
 				return errorPage ("Successfully Confirmed", acturl, self.response, 200)
 			else:
