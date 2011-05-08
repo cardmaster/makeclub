@@ -32,13 +32,16 @@ def templateFolder():
 def templateSet():
 	return 'default'
 
-def render(tempname, dict, currentUrl = '/', createLogInOutUrl = True):
+def render(tempname, dict, currentUrl = '/', createLogInOutUrl = True, dbgTemp = False):
 	pageFrame = os.path.join(templateFolder(), templateSet(), "pageframe.html")
 	dict['bodyTemplate'] = tempname
 	if ('pageTitle' not in dict):
 		dict['pageTitle'] = tempname[:tempname.rindex('.')]
 	if (createLogInOutUrl):
 		addLogInOutUrl(currentUrl, dict)
-#	templateFile = os.path.join (templateFolder(), templateSet(), tempname)
-	return template.render(pageFrame, dict)
+	if (dbgTemp):	
+		templateFile = os.path.join (templateFolder(), templateSet(), tempname)
+		return template.render(templateFile, dict)
+	else:
+		return template.render(pageFrame, dict)
 	

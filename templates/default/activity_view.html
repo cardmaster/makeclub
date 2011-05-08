@@ -32,11 +32,11 @@
 		{% for key,value in sop.data %}
 		<input type="hidden" name="{{ key }}" value="{{ value }}" />
 		{% endfor %}
-		<input type="submit" name="submit" value="{{ sop.oper }}" />
+		<input type="submit" name="submit" value="{{ sop.display }}" />
 	</form>
 	{% else %}
 	<div class="infoLine">
-		<a href="{{ sop.url }}">{{ sop.oper }} this activity</a>
+		<a href="{{ sop.url }}">{{ sop.display }} this activity</a>
 	</div>
 	{% endif %}
 </div>
@@ -51,6 +51,23 @@
 			{% if parti.confirmed %}
 			<font class="memberConfirmed">Confirmed</font>
 			{% endif %} 
+	{% for sop in participatorOps %}
+<div class="specialOperationContainer" style="width:30px;">
+	{% if sop.needPost %}
+	<form id="Parti{{ sop.oper }}Form" name="{{ sop.oper }}" method="post" action="{{ sop.url }}" >
+		{% for key,value in sop.data %}
+		<input type="hidden" name="{{ key }}" value="{{ value }}" />
+		{% endfor %}
+		<input type="hidden" name="target" value="{{parti.member.user.email}}" />
+		<input type="submit" name="submit" value="{% if sop.oper == 'confirm' and parti.confirmed %}Unconfirm{%else%}{{sop.display}}{%endif%}" />
+	</form>
+	{% else %}
+	<div class="infoLine">
+		<a href="{{ sop.url }}">{{ sop.oper }}</a>
+	</div>
+	{% endif %}
+</div>
+{% endfor %}
 			</li>
 			{% endfor %}
 		</ul>
