@@ -5,7 +5,7 @@
 	<body>
 	<div id="header">
 	{% if userName %}
-	Welcome Aboard, {{userName}}&lt;<a mailto="{{userEmail}}">{{userEmail}}</a>&gt;
+	Welcome Aboard, {{userName}}&lt;<a href="mailto:{{userEmail}}">{{userEmail}}</a>&gt;
 	{% endif %}
 	{% if logoutUrl %}
 	<a href="{{logoutUrl}}">Log Out</a>
