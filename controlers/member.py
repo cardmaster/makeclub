@@ -108,12 +108,12 @@ class Member(webapp.RequestHandler):
 		#Get club
 		club = Club.getClubBySlug(slug)
 		if (not club):	
-			return errorPage ("No such club " + slug, '/clubs', self.response, 404)
+			return errorPage ( self.response,  "No such club " + slug,   '/clubs',   404)
 	
 		#Check user status
 		user = users.get_current_user()
 		if (not user):
-			return errorPage ("User not login", users.create_login_url(self.request.uri), self.response, self.response, 403)
+			return errorPage ( self.response,  "User not login",   users.create_login_url(self.request.uri),   self.response,   403)
 	
 		#That the one we modify is the path user. if omitted, user current user as target
 		if (pathuser):
@@ -122,7 +122,7 @@ class Member(webapp.RequestHandler):
 			pathuser = user
 		#@warning: I don't know is it correct to add access control code here
 		if (not hasClubPrivilige(user, club, 'membership', pathuser.email())):
-			return errorPage ("Can not access", '/', self.response, 403)
+			return errorPage ( self.response,  "Can not access",   '/',   403)
 		self.user = user
 		self.club = club
 		self.member = Membership.between(pathuser, club)

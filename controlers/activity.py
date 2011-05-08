@@ -53,12 +53,10 @@ class ActivityBase(webapp.RequestHandler):
 	def checkPrivilige(self):
 		user = get_current_user()
 		if (not user):
-			errorPage ("Not login", create_login_url(self.request.url), self.response, 403)
+			errorPage ( self.response,  "Not login",   create_login_url(self.request.url),   403)
 			return False
 		if (not hasActPrivilige(user, self.actobj, self.actOperation)):
-			errorPage ("Not authorrized", 
-					urldict['ClubView'].path(self.actobj.club.slug), 
-					self.response, 403)
+			errorPage ( 					self.response,  "Not authorrized",   					urldict['ClubView'].path(self.actobj.club.slug),   403)
 			return False
 		return True
 			
@@ -71,7 +69,7 @@ class ActivityBase(webapp.RequestHandler):
 			else:
 				return
 		else:
-			return errorPage("No such Activity", urldict['ClubList'].path(), self.response, 404)
+			return errorPage( self.response,  "No such Activity",   urldict['ClubList'].path(),   404)
 
 class SpecialOp:
 	def __init__(self, oper = '', url = '', needPost = False, data = [], display = ''):
@@ -136,24 +134,24 @@ class ActivityParticipate(webapp.RequestHandler):
 		id = int(id)
 		actobj = self.getActModel(id)
 		if (not actobj):
-			return errorPage ("No such activity", urldict['ClubList'].path(), 404)
+			return errorPage (self.response,  urldict['ClubList'].path(),  "No such activity",  404 )
 		user = get_current_user();
 		if (not user):
-			return errorPage ("Not login", create_login_url(self.request.url), self.response, 403)
+			return errorPage ( self.response,  "Not login",   create_login_url(self.request.url),   403)
 		target = self.request.get ('target')
 		cluburl = urldict['ClubView'].path(actobj.club.slug)
 		if (not hasActPrivilige(user, actobj, oper,target) ):
-			return errorPage ("Can not access", cluburl, self.response, 403)
+			return errorPage ( self.response,  "Can not access",   cluburl,   403)
 		if (target):
 			targetUser = User(target)
 			if(not targetUser):
-				return errorPage ("Illegal access", cluburl, self.response, 403)
+				return errorPage ( self.response,  "Illegal access",   cluburl,   403)
 		else: #if target omitted, use current user as target
 			targetUser = user
 			
 		mem = Membership.between (targetUser, actobj.club)
 		if (not mem):
-			return errorPage ("Not a member", cluburl, self.response, 403)
+			return errorPage ( self.response,  "Not a member",   cluburl,   403)
 		
 		acturl = urldict['ActivityView'].path(id)
 		if (oper == 'join'):
@@ -166,7 +164,7 @@ class ActivityParticipate(webapp.RequestHandler):
 			actp = ActivityParticipator.between(mem, actobj)
 			if (actp):
 				if (actp.confirmed):
-					return errorPage ("Cannot delete confirmed participator", acturl, self.response, 403)
+					return errorPage ( self.response,  "Cannot delete confirmed participator",   acturl,   403)
 				else:
 					actp.delete()
 			return infoPage (self.response, "Successfully Quited", "%s success quit activity %s" % (mem.name, actobj.name), acturl)
@@ -177,9 +175,9 @@ class ActivityParticipate(webapp.RequestHandler):
 				actp.put()
 				return infoPage (self.response, "Successfully Confirmed", "success confirmed %s join activity %s" % (mem.name, actobj.name), acturl)
 			else:
-				return errorPage ("No Such a Member", acturl, self.response, 404)
+				return errorPage ( self.response,  "No Such a Member",   acturl,   404)
 		elif (oper == 'bill'):
-			return errorPage ("Not Implemented", acturl, self.response, 501)
+			return errorPage ( self.response,  "Not Implemented",   acturl,   501)
 
 def extractRequestData(request, interested):
 	retval = dict()
@@ -235,13 +233,11 @@ class ActivityEdit(ActivityBase):
 				self.updateObject(actobj)
 				key = actobj.put()
 				if (key):
-					return errorPage("Successfully storing this Activity", 
-									urldict['ActivityView'].path(key.id()), self.response, 200)
+					return errorPage( self.response,  "Successfully storing this Activity",   									urldict['ActivityView'].path(key.id()),   200)
 				else:
-					return errorPage("Error while storing this Activity", 
-									urldict['ActivityEdit'].path(actobj.key().id()), self.response, 501)
+					return errorPage( self.response,  "Error while storing this Activity",   									urldict['ActivityEdit'].path(actobj.key().id()),   501)
 		else:
-			return errorPage("No such Activity", urldict['ClubList'].path(), self.response, 404)
+			return errorPage( self.response,  "No such Activity",   urldict['ClubList'].path(),   404)
 
 class ActivityNew(ActivityEdit):
 	def getActModel(self):
@@ -258,9 +254,9 @@ class ActivityNew(ActivityEdit):
 	def checkPrivilige(self):
 		user = get_current_user()
 		if (not user):
-			errorPage ("Not login", create_login_url(self.request.url), self.response, 403)
+			errorPage ( self.response,  "Not login",   create_login_url(self.request.url),   403)
 			return False
 		if (not hasClubPrivilige(user, self.actobj.club, "newact")):
-			errorPage ("Not Authorized to edit", urldict['ClubView'].path(self.actobj.club.slug), self.response, 403)
+			errorPage ( self.response,  "Not Authorized to edit",   urldict['ClubView'].path(self.actobj.club.slug),   403)
 			return False
 		return True

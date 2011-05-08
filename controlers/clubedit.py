@@ -69,13 +69,13 @@ class ClubEdit(webapp.RequestHandler):
 				or (club.is_saved() and hasClubPrivilige(user, club, "edit")) ): #Edit
 			return True
 		else:
-			errorPage("Access Deny For club", users.create_login_url(self.request.uri), self.response)#Access Deny
+			errorPage( self.response,  "Access Deny For club",   users.create_login_url(self.request.uri))#Access Deny
 			return False
 
 	def get(self, *args):
 		stat, user = self.accessControl()
 		if (not stat):
-			return errorPage("Not Log in", user, self.response)
+			return errorPage( self.response,   "User %s Not Log in" % user,  users.create_login_url(self.request.uri))
 		if (self.clubmodel):
 			clubmd=self.clubmodel
 		else: 
