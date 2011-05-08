@@ -83,7 +83,10 @@ class ClubUser(AccessUser):
 	def __init__(self, user, club):
 		super(ClubUser, self).__init__(user)
 		self.club = club
-		self.member = Membership.between(user, club)
+		if (club.is_saved()):
+			self.member = Membership.between(user, club)
+		else:
+			self.member = None
 	def isClubOwner(self):
 		return self.user == self.club.owner
 	def hasMemberPrivilige(self, *args):
