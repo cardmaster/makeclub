@@ -18,12 +18,17 @@
  
  
 '''
-from user import UserList
-from user import UserView
-from club import ClubList, ClubView
-from clubedit import ClubEdit
-from url import urldict
-from member import Member
-from test import Test
-from activity import ActivityView, ActivityEdit, ActivityParticipate, ActivityNew
-from clubprivilige import ClubPrivilige
+
+from google.appengine.api import users
+from google.appengine.ext import webapp
+
+from template import render
+
+class ClubPrivilige(webapp.RequestHandler):
+	def __init__(self, 
+		template='clubpriv.html', *args, **kw ):
+		self.template = template
+	def get(self, *args):
+		pass
+	def post(self, *args):
+		pass
