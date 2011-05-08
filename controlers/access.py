@@ -36,7 +36,7 @@ clubOperations = [
 	"finance", #Could manage club balance and member's balance
 	"arrange",
 	"finish",
-	"newact",
+	"newAct",
 	"quit"
 ]
 
