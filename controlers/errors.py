@@ -25,7 +25,7 @@ def renderErrorPage(msg, redirect=''):
 	vars = dict(message=msg, redirect=redirect)
 	return render(tplt, vars, redirect)
 
-def errorPage(msg, redirect, response, status = 404):
+def errorPage(response, msg, redirect, status = 404):
 	response.set_status(status)
 	response.out.write (renderErrorPage(msg, redirect))
 	return False

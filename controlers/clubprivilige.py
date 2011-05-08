@@ -23,12 +23,46 @@ from google.appengine.api import users
 from google.appengine.ext import webapp
 
 from template import render
+from url import urldict
+from models import Club, Membership
+from errors import errorPage
+from infopage import infoPage
+from access import hasClubPrivilige, clubOperations 
 
 class ClubPrivilige(webapp.RequestHandler):
 	def __init__(self, 
 		template='clubpriv.html', *args, **kw ):
 		self.template = template
 	def get(self, *args):
-		print args
+		if (self.initRequest()):
+			currentPriv = ['newAct', 'view']
+			tempvars = dict (membership = self.target, 
+							operator = self.user, 
+							operations = clubOperations,
+							currentPriv = currentPriv)
+			self.response.out.write (render (self.template, tempvars))
+		
 	def post(self, *args):
-		print args
+		if (self.initRequest()):
+			print self.request
+	def initRequest(self):
+		urlconf = urldict[type(self).__name__]
+		slug, useremail = urlconf.analyze(self.request.path)
+		club = Club.getClubBySlug(slug)
+		if (not club):
+			return errorPage(self.response, "No Such Club: '%s'" % slug, urldict['ClubList'].path(), 404)
+		user = users.get_current_user()
+		pathuser = user
+		if (useremail):
+			getuser = users.User(useremail)
+			if (getuser):
+				pathuser = getuser
+		if (hasClubPrivilige(user, club, "privGrant", pathuser)):
+			self.user = user
+			self.target = Membership.between(pathuser, club)
+			if (self.target):
+				return True
+			else:
+				return errorPage(self.response, "User %s is not a member of club %s" % (pathuser, slug), urldict['ClubView'].path(slug), 403 )
+		else:
+			return errorPage(self.response, "Access Deny For Privilige Grant Operation on Club %s, to user %s" % (slug, pathuser), urldict['ClubView'].path(slug), 403 )

@@ -1,0 +1,13 @@
+
+<form name="clubpriv" method="post" action="">
+<div class="selectBox">
+<select multiple="multiple" size="5">
+{% for op in operations %}
+<option {% if op in currentPriv %}selected="selected"{% endif %}>{{ op }}</option>
+{% endfor %}
+</select>
+</div>
+<div class="submitLine">
+<input type="submit" value="Set Priviliges" />
+</div>
+</form>
