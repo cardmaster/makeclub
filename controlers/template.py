@@ -23,6 +23,7 @@ use_library('django', '1.2')
 from google.appengine.ext.webapp import template
 import os
 from url import urldict
+from helper import addLogInOutUrl
 
 register = template.create_template_register()
 	
@@ -31,7 +32,13 @@ def templateFolder():
 def templateSet():
 	return 'default'
 
-def render(tempname, dict):
-	templateFile = os.path.join (templateFolder(), templateSet(), tempname)
-	return template.render(templateFile, dict)
+def render(tempname, dict, createLogInOutUrl = True):
+	pageFrame = os.path.join(templateFolder(), templateSet(), "pageframe.html")
+	dict['bodyTemplate'] = tempname
+	if ('pageTitle' not in dict):
+		dict['pageTitle'] = tempname[:tempname.rindex('.')]
+	if (createLogInOutUrl):
+		addLogInOutUrl('/', dict)
+#	templateFile = os.path.join (templateFolder(), templateSet(), tempname)
+	return template.render(pageFrame, dict)
 	

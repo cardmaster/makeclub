@@ -1,0 +1,20 @@
+<html>
+	<head>
+		<title>{{ pageTitle }}</title>
+	</head>
+	<body>
+	<div id="header">
+	{% if userName %}
+	Welcome Aboard, {{userName}}&lt;<a mailto="{{userEmail}}">{{userEmail}}</a>&gt;
+	{% endif %}
+	{% if logoutUrl %}
+	<a href="{{logoutUrl}}">Log Out</a>
+	{% endif %}
+	{% if loginUrl %}
+	<a href="{{loginUrl}}">Log In</a>
+	{% endif %}
+	</div>
+	{% include bodyTemplate %}
+	</body>
+</html>
+
