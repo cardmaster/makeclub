@@ -25,6 +25,6 @@ This is the global config for our little app
 
 class Conf:
 	def __init__(self):
-		self.MaxClubsPerUser = 3
+		self.MaxClubsPerUser = 5
 		
 conf = Conf()

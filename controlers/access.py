@@ -50,6 +50,8 @@ actOperatoins = [
 ]
 class AccessUser(object):
 	def __init__(self, user):
+		if (not user):
+			user = users.get_current_user()
 		self.user = user
 		self.currentCheck = None
 	def can(self, operation, *args):
@@ -71,6 +73,8 @@ class SystemUser(AccessUser):
 		return True
 	def can_createClub(self, *args):
 		cq = Club.all()
+		if (not self.user):
+			return False
 		cq.filter('owner =', self.user)
 		if (cq.count() < conf.MaxClubsPerUser):
 			return True
