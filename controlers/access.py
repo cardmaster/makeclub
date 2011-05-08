@@ -62,7 +62,7 @@ class AccessUser(object):
 			if (hasattr(self, defaultCheckerName)):
 				methodName = defaultCheckerName
 			else:
-				return False						
+				return False
 		checker = getattr(self, methodName)
 		if (not checker or not callable(checker)):
 			return False
