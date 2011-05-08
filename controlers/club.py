@@ -26,6 +26,7 @@ from url import urldict
 from errors import errorPage
 from template import render
 from datetime import datetime
+from google.appengine.api import users
 
 editurlconf = urldict['ClubEdit']
 listurlconf = urldict['ClubList']
@@ -50,7 +51,6 @@ class ClubList(webapp.RequestHandler):
 		else:
 			errorPage("Not Accessible", users.create_login_url(self.request.uri), self.response)
 
-from google.appengine.api import users
 class ClubView(webapp.RequestHandler):
 	def __init__(self, 
 			template='clubview.html', *args, **kw ):

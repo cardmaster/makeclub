@@ -19,6 +19,8 @@
  
 '''
 
+from google.appengine.api import users
+
 #Get the last WORDs after the last slash, if no slash in this string, return empty input arg
 def lastWordOfUrl(url):
 	slug = url
@@ -41,3 +43,11 @@ def splitPath(url, start='', n=2):
 			if (i >= n): return ary
 	return ary
 
+def addLogInOutUrl(currentUrl, dict):
+	user = users.get_current_user()
+	if (user):
+		dict['userName'] = user.nickname()
+		dict['userEmail'] = user.email()
+		dict['logoutUrl'] = users.create_logout_url(currentUrl)
+	else :
+		dict['loginUrl'] = users.create_login_url(currentUrl)
