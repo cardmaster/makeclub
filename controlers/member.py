@@ -124,7 +124,7 @@ class Member(webapp.RequestHandler):
 			return errorPage ("Can not access", '/', self.response, 403)
 		self.user = user
 		self.club = club
-		self.member = Membership.between(user, club)
+		self.member = Membership.between(pathuser, club)
 		self.targetUser = pathuser
 		return True
 	
