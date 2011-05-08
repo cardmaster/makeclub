@@ -52,8 +52,6 @@
 			<font class="memberConfirmed">Confirmed</font>
 			{% endif %} 
 	{% for sop in participatorOps %}
-	{% if sop.oper == 'confirm' and parti.confirmed %}
-	{% else %}
 <div class="specialOperationContainer" style="width:30px;">
 	{% if sop.needPost %}
 	<form id="Parti{{ sop.oper }}Form" name="{{ sop.oper }}" method="post" action="{{ sop.url }}" >
@@ -61,7 +59,7 @@
 		<input type="hidden" name="{{ key }}" value="{{ value }}" />
 		{% endfor %}
 		<input type="hidden" name="target" value="{{parti.member.user.email}}" />
-		<input type="submit" name="submit" value="{{ sop.oper }}" />
+		<input type="submit" name="submit" value="{% if sop.oper == 'confirm' and parti.confirmed %}Unconfirm{%else%}{{sop.oper}}{%endif%}" />
 	</form>
 	{% else %}
 	<div class="infoLine">
@@ -69,7 +67,6 @@
 	</div>
 	{% endif %}
 </div>
-{% endif %}
 {% endfor %}
 			</li>
 			{% endfor %}

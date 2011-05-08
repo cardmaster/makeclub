@@ -102,7 +102,7 @@ class ActivityView(ActivityBase):
 		defaults['specialOps'] = specialOps
 		
 		participatorOps = []
-		for oper in ('confirm', 'quit'):
+		for oper in ('confirm', ):
 			if (hasActPrivilige(user, self.actobj, oper) ):
 				sop = SpecialOp(oper, urlcfg.path(aid, oper), True, [])
 				participatorOps.append(sop)
