@@ -21,6 +21,7 @@ from google.appengine.api.users import get_current_user, create_login_url, User
 from google.appengine.ext import webapp
 from google.appengine.ext import db
 from errors import errorPage
+from infopage import infoPage
 from access import hasActPrivilige, hasClubPrivilige
 from models import Activity, Membership, Club, ActivityParticipator
 from url import urldict
@@ -160,7 +161,7 @@ class ActivityParticipate(webapp.RequestHandler):
 			if (not actp):
 				actp = ActivityParticipator(member = mem, activity = actobj)
 				actp.put()
-			return errorPage ("Successfully Joined", acturl, self.response, 200)
+			return infoPage (self.response, "Successfully Joined", "%s has join activity %s" % (mem.name, actobj.name), acturl)
 		elif (oper == 'quit'):
 			actp = ActivityParticipator.between(mem, actobj)
 			if (actp):
@@ -168,13 +169,13 @@ class ActivityParticipate(webapp.RequestHandler):
 					return errorPage ("Cannot delete confirmed participator", acturl, self.response, 403)
 				else:
 					actp.delete()
-			return errorPage ("Successfully Quited", acturl, self.response, 200)
+			return infoPage (self.response, "Successfully Quited", "%s success quit activity %s" % (mem.name, actobj.name), acturl)
 		elif (oper == 'confirm'):
 			actp = ActivityParticipator.between(mem, actobj)
 			if (actp):
 				actp.confirmed = not actp.confirmed 
 				actp.put()
-				return errorPage ("Successfully Confirmed", acturl, self.response, 200)
+				return infoPage (self.response, "Successfully Confirmed", "success confirmed %s join activity %s" % (mem.name, actobj.name), acturl)
 			else:
 				return errorPage ("No Such a Member", acturl, self.response, 404)
 		elif (oper == 'bill'):
@@ -230,7 +231,7 @@ class ActivityEdit(ActivityBase):
 			if (self.checkPrivilige()):
 				if (self.request.get ('delete', False)):
 					actobj.delete()
-					return errorPage ("Successful deleted", "/", self.response, 200)
+					return infoPage (self.response, "Successful deleted", "Deleted Activity %s" % actobj.name, "/")
 				self.updateObject(actobj)
 				key = actobj.put()
 				if (key):

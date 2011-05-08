@@ -29,4 +29,5 @@ InfoPageTempl = 'infopage.html'
 
 def infoPage(response, title = '', message = '', redirect = ''):
 	vars = dict(title = title, pageTitle = title, message = message, redirect = redirect)
-	response.out.write (render(infoPageTempl, vars))
+	response.out.write (render(InfoPageTempl, vars))
+	return True

@@ -28,6 +28,7 @@ from template import render
 from access import hasClubPrivilige
 from helper import lastWordOfUrl
 from errors import errorPage
+from infopage import infoPage
 
 '''	
 Every response method will call visit() first, this will load user(operator),
@@ -53,7 +54,7 @@ class Member(webapp.RequestHandler):
 			#If find 'delete' in the request data, we'll delete the member specify by the path
 			if (self.judgeDelete()):
 				self.doDelete()
-				errorPage("Delete Succeed", urldict['ClubView'].path(self.club.slug), self.response, 200)
+				infoPage(self.response, "Delete Succeed", "Deleted", urldict['ClubView'].path(self.club.slug))
 				return True
 			#Esle we'll construct membership object via postdata
 			member = self.getPostData()

@@ -24,6 +24,7 @@ from google.appengine.ext import webapp
 from models import Club, Membership
 from template import render
 from errors import errorPage
+from infopage import infoPage
 from access import hasClubPrivilige, isAccessible
 from helper import splitPath
 from url import urldict
@@ -118,7 +119,7 @@ class ClubEdit(webapp.RequestHandler):
 				if (isNewClub): #Create New Membership For Owner when create the club
 					mem = Membership(user=user, club = clubmd)
 					mem.put()
-				errorPage ("Successfullyt Saved Club", urldict['ClubView'].path(clubmd.slug), self.response, 200)
+				infoPage (self.response, "Successfullyt Saved Club", "Club Saved", urldict['ClubView'].path(clubmd.slug))
 			else:
 				return
 		else:
