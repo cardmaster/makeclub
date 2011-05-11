@@ -60,6 +60,7 @@ class ActivityBase(webapp.RequestHandler):
 			return False
 		return True
 	def dbg(self, *args):
+		return #Clean up debug code
 		self.response.out.write (" ".join([str(arg) for arg in args]))
 		self.response.out.write ("<br />\n")
 			

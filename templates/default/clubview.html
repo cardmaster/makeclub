@@ -1,15 +1,16 @@
 <div id="pageContainer">
-	<div class="clubNameLine">
+	<div class="infoLine">
 		{{ club.name }}
 	</div>
-	<div class="clubIntroLine">
+	<div class="infoLine">
 		<p>This club is Create By {{ club.owner }}</p>
 		{% if editurl %}
 		<p>You can <a href="{{ editurl }}" alt="Edit Club" class="clubOperation">Edit This Club</a></p>
 		{% endif %}
 		<p>{{ club.intro }}</p>
+		<p>Club Fund: {{ club.fund }}</p>
 	</div>
-	<div class="applyClub">
+	<div class="operationLine">
 		{% if membership %}
 		<div class="yourMembership">
 			You are member of this club ({{membership.name}}&lt;<a href="mailto:{{ membership.email }}">{{ membership.email }}</a>&gt;). 
@@ -31,7 +32,7 @@
 		{% endif %}
 	</div>
 	{% if newAct %}
-	<div class="clubOperations"> 
+	<div class="operationLine"> 
 		<a href="{{ newAct }}" >Create New Activity</a>
 	</div>
 	{% endif %}
