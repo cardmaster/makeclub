@@ -125,7 +125,6 @@ class ActivityBill(db.Model):
 		self.oldfund = oldfund
 		super(ActivityBill, self).__init__(*args, **kw)
 	def cancel(self):
-		print "enter cancel method", " isCancelled=", self.isCancelled
 		if (self.isCancelled):
 			return True
 		self.activity.isBilled=False
@@ -143,10 +142,8 @@ class ActivityBill(db.Model):
 				actp.expense = 0
 				actp.put()
 		club = self.activity.club
-		print "club fund=", club.fund, "-", self.sum
 		club.fund -= self.sum #When cancel, not effect
 		club.put()	
-		print "club fund=", club.fund
 		self.put()
 	def put(self):
 		if (not (self.isExecuted or self.isCancelled)):
@@ -175,10 +172,8 @@ class ActivityBill(db.Model):
 			oldfund = self.oldfund
 		else:
 			oldfund = club.fund
-		print "club fund=", oldfund, "+", self.sum
 		club.fund = oldfund + self.sum #When do bill, member's money will go to club's fund
 		club.put()			
-		print "club fund=", club.fund
 	@staticmethod
 	def getBill(actobj):
 		aq = ActivityBill.all()
@@ -193,7 +188,6 @@ class ActivityBill(db.Model):
 		if (oldBill):
 			oldBill.cancel()
 			fund = oldBill.activity.club.fund
-			print "old club fund=", fund
 		cost = actobj.bill
 		expense = actobj.expense
 		actDur = actobj.duration
