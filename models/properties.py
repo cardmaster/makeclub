@@ -19,7 +19,7 @@
  
 '''
 from google.appengine.ext import db
-from decimal import Decimal
+from decimal import Decimal,getcontext
 class MoneyProperty(db.StringProperty):
 	data_type = Decimal
 	def __init__(self, *args, **kw):

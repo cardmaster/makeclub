@@ -23,7 +23,7 @@ from google.appengine.ext import db
 from errors import errorPage
 from infopage import infoPage
 from access import hasActPrivilige, hasClubPrivilige
-from models import Activity, Membership, Club, ActivityParticipator
+from models import Activity, Membership, Club, ActivityParticipator, ActivityBill
 from url import urldict
 from template import render
 
@@ -180,7 +180,9 @@ class ActivityParticipate(webapp.RequestHandler):
 			else:
 				return errorPage ( self.response,  "No Such a Member",   acturl,   404)
 		elif (oper == 'bill'):
-			return errorPage ( self.response,  "Not Implemented",   acturl,   501)
+			billobj = ActivityBill.generateBill(actobj, True)
+			print billobj.memberBill
+#			billobj.put()
 
 def extractRequestData(request, interested, dbg=None):
 	retval = dict()

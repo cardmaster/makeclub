@@ -15,10 +15,21 @@
     You should have received a copy of the GNU Affero General Public License
     along with makeclub.  If not, see <http://www.gnu.org/licenses/>.
 
- 
- 
 '''
-from membership import Membership
-from club import Club
-from activity import Activity, ActivityParticipator, ActivityBill
-from conf import conf
+
+'''
+This object could decrease the user's left amout, and mark activity as billed
+And create a bill record in our databse
+'''
+class ActivityBiller:
+	def __init__(self, actobj):
+		self.act = actobj
+		
+	#return True if success
+	def doBill(self):
+		pass
+	#Remove previouse bill operation(if existed), return True if operation suceessfull or 
+	#No previous bill existed
+	def undo(self):
+		pass
+
