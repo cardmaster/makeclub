@@ -1,0 +1,25 @@
+{% if postStatus %}
+<div class="postStatus">{{ postStatus }} saved membership between <a href="{{ cluburl }}">{{ club.name }}</a> and {{ member.name }}</div>
+{% endif %}
+<h1>Membership of Club <a href="{{ cluburl }}">{{ club.name }}</a></h1>
+<form id="membership" method="post" action="{{ action }}">
+	<div class="clubKeyInputLine"><span class="inputName">Name:&nbsp; </span>
+		<input type="text" name="name" value="{{ member.name }}" /> </div>
+	<div class="clubNameInputLine"><span class="inputName">Email: </span>
+		<input type="text" name="email" value="{{ member.email }}" /> </div>
+	<div class="clubFundInputLine"><span class="inputName">Balance: </span>
+		<input type="text" {% if enableFinace %}{%else%}disabled="true"{%endif%} name="balance" value="{{ member.balance }}" /> </div>
+	<div class="clubIntroInput"><span class="inputName">Leave Message</span><br />
+		<textarea name="intro" class="clubIntroInput" >say something to {{ member.name }}</textarea>
+	</div>
+	<div class="clubFundInputLine"><span class="inputName">I'm sure it's done: </span>
+		<input type="submit" value="OK, Update" />
+	</div>
+</form>
+<div class="deleteMember">
+	<form id="deleteMember" name="delete" method="post" action="{{ action }}">
+		<input type="hidden" name="delete" value="True" />
+		<input type="submit" name="quit" value="Quit This Club" />
+	</form>
+</div>
+

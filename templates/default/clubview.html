@@ -1,0 +1,67 @@
+<div id="pageContainer">
+	<div class="infoLine">
+		{{ club.name }}
+	</div>
+	<div class="infoLine">
+		<p>This club is Create By {{ club.owner }}</p>
+		{% if editurl %}
+		<p>You can <a href="{{ editurl }}" alt="Edit Club" class="clubOperation">Edit This Club</a></p>
+		{% endif %}
+		<p>{{ club.intro }}</p>
+		<p>Club Fund: {{ club.fund }}</p>
+	</div>
+	<div class="operationLine">
+		{% if membership %}
+		<div class="yourMembership">
+			You are member of this club ({{membership.name}}&lt;<a href="mailto:{{ membership.email }}">{{ membership.email }}</a>&gt;). 
+			balance: <span class="userbalance">{{ membership.balance }}</span>
+			| <a href="/member/{{ club.slug }}">Edit My Member Ship</a>  
+		</div>
+		{% else %}
+		{% if userName %}
+		<form name="applyClub" method="post" action="{{ action }}">
+			<div class="applyInfo">
+				<span class="inputPropmt namePrompt">Name In Club: </span><input type="text" name="name" text="{{ userName }}" />
+				<span class="inputPropmt namePrompt">Email In Club: </span><input type="text" name="email" text="{{ userEmail }}" />
+				<input class="submit" type="submit" value="Join This Club" />
+			</div>
+		</form>
+		{% else %}
+		Please <a alt="click to login" href="{{ loginUrl }}">log in</a> before join this club.
+		{% endif %}
+		{% endif %}
+	</div>
+	{% if newAct %}
+	<div class="operationLine"> 
+		<a href="{{ newAct }}" >Create New Activity</a>
+	</div>
+	{% endif %}
+	<div class="listContainer">
+		<div class="clubMemebersHeader">
+			Members of Club {{ club.name }}
+		</div>
+		<div class="clubMemeberListArea">
+			<ul>
+				{% for member in members %}
+				<li>{{ member.user }}, {{ member.name }} (Priviliges:{{member.privilige|join:', '}})
+				{% if member.privEdit %}
+				<a href="{{member.privEdit}}">Edit Priviliges</a>
+				{% endif %}
+				</li>
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
+	<div class="listContainer">
+		<div class="listHeader">
+			Activities of Club {{ club.name }}
+		</div>
+		<div class="listArea">
+			<ul>
+				{% for act in acts %}
+				<li><a href="{{ act.linkpath }}">{{ act.name }}</a>, {{ act.startTime }} duration {{ act.duration }} hours</li>
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
+

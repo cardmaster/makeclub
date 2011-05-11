@@ -1,0 +1,46 @@
+{% if postStatus %}
+<div class="postStatus">{{ postStatus }} saved membership between <a href="{{ cluburl }}">{{ act.club.name }}</a></div>
+{% endif %}
+<h1>Activity of Club <a href="{{ cluburl }}">{{ club.name }}</a></h1>
+<form id="activity" method="post" action="{{ action }}">
+	<div class="inputLine"><span class="inputName">Activity Name:&nbsp; </span>
+		<input type="text" name="name" value="{{ act.name }}" /> </div>
+	<div class="inputLine"><span class="inputName">Start Time: </span>
+		<input type="text" name="startTime" value="{{ act.startTime }}" /> </div>
+	<div class="inputLine"><span class="inputName">Duration: </span>
+		<input type="text" name="duration" value="{{ act.duration }}h" /><span class="inputComments">e.g. 30m, 1h30m, 1h, 1d2h, 1d3h33m </span> </div>
+	<div class="inputLine"><span class="inputName">Introduction</span><br />
+		<textarea name="intro" class="multiLineTextInput" id="actIntro" >{{ act.intro }}</textarea>
+	</div>
+	<div class="inputLine"><span class="inputName">Bill</span><br />
+		<textarea name="bill" class="multiLineTextInput" id="billList">{% for bentry in act.bill %}{% for item in bentry %}{{ item }},{% endfor %}
+{% endfor %}</textarea><br />
+		<span class="inputName">Expense: </span>
+		<span id="totalExpense" >{{ act.expense }}</span>
+	</div>
+	<div class="inputLine"><span class="inputName">I'm sure it's done: </span>
+		<input type="submit" value="OK, Update" />
+	</div>
+</form>
+
+<div class="specialOperationContainer">
+	<form id="billActivity" name="sendBill" method="post" action="{{ action }}">
+		<input type="hidden" name="bill" value="True" />
+		<input type="submit" name="bill" value="Sen Bill To Participants" />
+	</form>
+</div>
+
+<div class="specialOperationContainer">
+	<form id="joinActivity" name="join" method="post" action="{{ action }}">
+		<input type="hidden" name="join" value="True" />
+		<input type="submit" name="joinAct" value="Join This Activity" />
+	</form>
+</div>
+
+<div class="specialOperationContainer">
+	<form id="deleteActivity" name="delete" method="post" action="{{ action }}">
+		<input type="hidden" name="delete" value="True" />
+		<input type="submit" name="remove" value="Remove This Activity" />
+	</form>
+</div>
+

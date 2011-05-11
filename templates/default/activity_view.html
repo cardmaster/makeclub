@@ -1,0 +1,76 @@
+{% if postStatus %}
+<div class="postStatus">{{ postStatus }} saved membership between
+	<a href="{{ cluburl }}">{{ act.club.name }}</a>
+</div>
+{% endif %}
+
+<h1>Activity of Club <a href="{{ cluburl }}">{{ club.name }}</a></h1>
+<div class="infoLine"><span class="fieldName">Activity
+		Name:&nbsp; </span> <span type="text" id="name">{{ act.name }}</span></div>
+<div class="infoLine"><span class="fieldName">Start Time: </span>
+	<span type="text" id="startTime">{{ act.startTime }}</span></div>
+<div class="infoLine">
+	<span class="fieldName">Duration: </span> <span
+		type="text" id="startTime">{{ act.duration }}h</span>
+</div>
+<div class="infoLine"><span class="fieldName">Introduction</span><br />
+	<div class="introText" id="actIntro">{{ act.intro }}</div>
+</div>
+<div class="infoLine"><span class="fieldName">Bill</span><br />
+	<div class="billField" id="bill">
+		{% for bentry in act.bill %} 
+		<div class="billLine">{% for item in bentry %}{{ item }} {% endfor %}</div>
+		{% endfor %}
+	</div><br />
+	<span class="fieldName">Expense: </span> <span id="totalExpense">{{ act.expense }}</span>
+</div>
+
+{% for sop in specialOps %}
+<div class="specialOperationContainer">
+	{% if sop.needPost %}
+	<form id="{{ sop.oper }}Form" name="{{ sop.oper }}" method="post" action="{{ sop.url }}" >
+		{% for key,value in sop.data %}
+		<input type="hidden" name="{{ key }}" value="{{ value }}" />
+		{% endfor %}
+		<input type="submit" name="submit" value="{{ sop.display }}" />
+	</form>
+	{% else %}
+	<div class="infoLine">
+		<a href="{{ sop.url }}">{{ sop.display }} this activity</a>
+	</div>
+	{% endif %}
+</div>
+{% endfor %}
+
+<div class="listContainer">
+	<div class="listHead">Participators</div>
+	<div class="listBody">
+		<ul>
+			{% for parti in participators %}
+			<li>{{ parti.member.name }} &lt;<a href="mailto:{{ parti.member.email }}">{{ parti.member.email }}</a>&gt;
+			{% if parti.confirmed %}
+			<font class="memberConfirmed">Confirmed</font>
+			{% endif %} 
+	{% for sop in participatorOps %}
+<div class="specialOperationContainer" style="width:30px;">
+	{% if sop.needPost %}
+	<form id="Parti{{ sop.oper }}Form" name="{{ sop.oper }}" method="post" action="{{ sop.url }}" >
+		{% for key,value in sop.data %}
+		<input type="hidden" name="{{ key }}" value="{{ value }}" />
+		{% endfor %}
+		<input type="hidden" name="target" value="{{parti.member.user.email}}" />
+		<input type="submit" name="submit" value="{% if sop.oper == 'confirm' and parti.confirmed %}Unconfirm{%else%}{{sop.display}}{%endif%}" />
+	</form>
+	{% else %}
+	<div class="infoLine">
+		<a href="{{ sop.url }}">{{ sop.oper }}</a>
+	</div>
+	{% endif %}
+</div>
+{% endfor %}
+			</li>
+			{% endfor %}
+		</ul>
+	</div>
+</div>
+
