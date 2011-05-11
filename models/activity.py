@@ -104,6 +104,13 @@ class ActivityParticipator(db.Model):
 			entry = oldms
 		return db.Model.put (entry)
 	
+'''
+The 'oldfund' property here is a quickfix
+Cause the GAE will not update the club value when you call bill.cancel()
+then newbill.put()
+during the put, is you call the 'execute()', in this time,
+you can not get the newest value of club.fund, so we use this 'oldfund' to walk-around this problem.
+'''
 class ActivityBill(db.Model):
 	activity = db.ReferenceProperty(Activity, required=True)
 	expenseBill = BillProperty(required = True) #e.g., court fee, 100, balls fee 70
@@ -114,7 +121,11 @@ class ActivityBill(db.Model):
 	operator = db.UserProperty(required = True, auto_current_user=True)
 	isCancelled = db.BooleanProperty(default=False)
 	cancelTime = db.DateTimeProperty()
+	def __init__(self, oldfund = None, *args, **kw):
+		self.oldfund = oldfund
+		super(ActivityBill, self).__init__(*args, **kw)
 	def cancel(self):
+		print "enter cancel method", " isCancelled=", self.isCancelled
 		if (self.isCancelled):
 			return True
 		self.activity.isBilled=False
@@ -132,10 +143,13 @@ class ActivityBill(db.Model):
 				actp.expense = 0
 				actp.put()
 		club = self.activity.club
+		print "club fund=", club.fund, "-", self.sum
 		club.fund -= self.sum #When cancel, not effect
 		club.put()	
+		print "club fund=", club.fund
+		self.put()
 	def put(self):
-		if (not self.isExecuted):
+		if (not (self.isExecuted or self.isCancelled)):
 			self.execute()
 		return super(ActivityBill, self).put()
 	#will casue member money decrease
@@ -157,20 +171,29 @@ class ActivityBill(db.Model):
 			actp.expense = cost
 			actp.put()
 		club = self.activity.club
-		club.fund += self.sum #When do bill, member's money will go to club's fund
+		if (self.oldfund):
+			oldfund = self.oldfund
+		else:
+			oldfund = club.fund
+		print "club fund=", oldfund, "+", self.sum
+		club.fund = oldfund + self.sum #When do bill, member's money will go to club's fund
 		club.put()			
+		print "club fund=", club.fund
 	@staticmethod
 	def getBill(actobj):
 		aq = ActivityBill.all()
-		aq.filter("activity =", actobj)
+		aq.filter("activity =", actobj).filter("isCancelled =", False)
 		return aq.get()
 	@staticmethod
 	def generateBill(actobj, allowRebill = False): #Generate a new bill object by given activity object
 		oldBill = ActivityBill.getBill(actobj)
 		if (not allowRebill and oldBill):
 			return None
+		fund = False
 		if (oldBill):
 			oldBill.cancel()
+			fund = oldBill.activity.club.fund
+			print "old club fund=", fund
 		cost = actobj.bill
 		expense = actobj.expense
 		actDur = actobj.duration
@@ -197,5 +220,5 @@ class ActivityBill(db.Model):
 			summoney += mDecExp
 			tup = (email, mDecExp)
 			mb.append(tup)
-		bill = ActivityBill(activity = actobj, expenseBill = actobj.bill, memberBill = mb, sum=summoney)
+		bill = ActivityBill(fund, activity = actobj, expenseBill = actobj.bill, memberBill = mb, sum=summoney)
 		return bill
