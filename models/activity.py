@@ -65,6 +65,7 @@ class Activity(db.Model):
 class ActivityParticipator(db.Model):
 	activity = db.ReferenceProperty(Activity, required=True)
 	member = db.ReferenceProperty(Membership, required=True)
+	expense = MoneyProperty(default=Decimal(0))
 	duration = db.FloatProperty(default = -1.0) #Unit is hours
 	#Either Confirmed by Organizer or yourself, after confirmed, you cannot quit.
 	confirmed = db.BooleanProperty(default = False)
@@ -100,8 +101,9 @@ class ActivityParticipator(db.Model):
 	
 class ActivityBill(db.Model):
 	activity = db.ReferenceProperty(Activity, required=True)
-	expenseBill = BillProperty() #e.g., court fee, 100, balls fee 70
-	memberBill = BillProperty() #e.g., leaf, 100, wangyang, 200
+	expenseBill = BillProperty(required = True) #e.g., court fee, 100, balls fee 70
+	memberBill = BillProperty(required = True) #e.g., leaf, 100, wangyang, 200
+	isExecuted = db.BooleanProperty(default=False)
 	createTime = db.DateTimeProperty(auto_now=True, required=True)
 	operator = db.UserProperty(required = True, auto_current_user=True)
 	isCancelled = db.BooleanProperty(default=False)
@@ -117,8 +119,34 @@ class ActivityBill(db.Model):
 			mem = Membership.between(user, self.activity.club)
 			if (mem):
 				mem.balance = mem.balance + money
+				mem.put()
+				actp = ActivityParticipator.between(mem, self.activity)
+				actp.expense = 0
+				actp.put()
 	def put(self):
-		super(db.Model, self).put()
+		if (not self.isExecuted):
+			self.execute()
+		return super(ActivityBill, self).put()
+	#will casue member money decrease
+	def execute(self):
+		if (self.isExecuted):
+			print "duplicated bill model exec call"
+			return
+		self.isExecuted = True
+		for tup in self.memberBill:
+			email = tup[0]
+			cost = tup[1]
+			user = users.User(email)
+			print "user=", user, " cost=", cost
+			mem = Membership.between(user, self.activity.club)
+			bal = mem.balance
+			mem.balance = bal - cost
+			mem.put()
+			actp = ActivityParticipator.between(mem, self.activity)
+			actp.expense = cost
+			actp.put()
+			print "member ", mem.user, " blance ", bal, "=>", mem.balance
+			
 	@staticmethod
 	def getBill(actobj):
 		aq = ActivityBill.all()

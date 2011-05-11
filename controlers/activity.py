@@ -182,7 +182,7 @@ class ActivityParticipate(webapp.RequestHandler):
 		elif (oper == 'bill'):
 			billobj = ActivityBill.generateBill(actobj, True)
 			print billobj.memberBill
-#			billobj.put()
+			billobj.put()
 
 def extractRequestData(request, interested, dbg=None):
 	retval = dict()
