@@ -130,14 +130,12 @@ class ActivityBill(db.Model):
 	#will casue member money decrease
 	def execute(self):
 		if (self.isExecuted):
-			print "duplicated bill model exec call"
 			return
 		self.isExecuted = True
 		for tup in self.memberBill:
 			email = tup[0]
 			cost = tup[1]
 			user = users.User(email)
-			print "user=", user, " cost=", cost
 			mem = Membership.between(user, self.activity.club)
 			bal = mem.balance
 			mem.balance = bal - cost
@@ -145,7 +143,6 @@ class ActivityBill(db.Model):
 			actp = ActivityParticipator.between(mem, self.activity)
 			actp.expense = cost
 			actp.put()
-			print "member ", mem.user, " blance ", bal, "=>", mem.balance
 			
 	@staticmethod
 	def getBill(actobj):
