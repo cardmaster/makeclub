@@ -165,6 +165,7 @@ class ActivityBill(db.Model):
 		expense = actobj.expense
 		actDur = actobj.duration
 		persons = ActivityParticipator.ofAct(actobj)
+		persons.filter("confirmed =", True)
 		sumdur = 0.0
 		tuplist = list()
 		for person in persons:
