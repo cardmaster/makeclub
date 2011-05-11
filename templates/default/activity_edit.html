@@ -13,8 +13,8 @@
 		<textarea name="intro" class="multiLineTextInput" id="actIntro" >{{ act.intro }}</textarea>
 	</div>
 	<div class="inputLine"><span class="inputName">Bill</span><br />
-		<textarea name="intro" class="multiLineTextInput" id="actIntro" >{% for bentry in act.bill %}{% for item in bentry %}{{ item }},{% endfor %}
-			{% endfor %}</textarea><br />
+		<textarea name="bill" class="multiLineTextInput" id="billList">{% for bentry in act.bill %}{% for item in bentry %}{{ item }},{% endfor %}
+{% endfor %}</textarea><br />
 		<span class="inputName">Expense: </span>
 		<span id="totalExpense" >{{ act.expense }}</span>
 	</div>

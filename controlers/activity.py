@@ -59,6 +59,9 @@ class ActivityBase(webapp.RequestHandler):
 			errorPage ( 					self.response,  "Not authorrized",   					urldict['ClubView'].path(self.actobj.club.slug),   403)
 			return False
 		return True
+	def dbg(self, *args):
+		self.response.out.write (" ".join([str(arg) for arg in args]))
+		self.response.out.write ("<br />\n")
 			
 	def get(self, *args):
 		actobj = self.getActModel()
@@ -179,10 +182,12 @@ class ActivityParticipate(webapp.RequestHandler):
 		elif (oper == 'bill'):
 			return errorPage ( self.response,  "Not Implemented",   acturl,   501)
 
-def extractRequestData(request, interested):
+def extractRequestData(request, interested, dbg=None):
 	retval = dict()
 	for (key, valid) in interested.iteritems() :
 		val = valid (request.get(key))
+		if (dbg):
+			dbg ( "Extract:", key, "=", val)
 		if (val):
 			retval [key] = val
 	return retval
@@ -194,14 +199,18 @@ def parseDuration(times):
 	 print "Times String: ", tstr
 	 return float(tstr)
 	
-def parseBill (billstr):
+def parseBill (billstr, dbg = None):
 	entries = billstr.split (',')
 	ary = []
+	if (dbg):
+		dbg ("Bill String:", billstr)
+		dbg ("Splitted:", entries)
 	i = 1
 	for ent in entries:
+		ent = ent.strip()
 		if (i == 2):
 			val = ent
-			ary.push ( (key, val) )
+			ary.append ( (key, val) )
 			i = 0
 		else :
 			key = ent
@@ -215,10 +224,13 @@ class ActivityEdit(ActivityBase):
 		self.urlcfg = urldict['ActivityEdit']
 		self.actobj = None
 		self.actOperation = "edit"
+	def parseBillDbg(self, billstr):
+		return parseBill(billstr, self.dbg)
 	def updateObject(self, actobj):
-		interested = dict (name = str, intro = str, duration = parseDuration, bill = parseBill)
-		reqs = extractRequestData (self.request, interested)
+		interested = dict (name = str, intro = str, duration = parseDuration, bill = self.parseBillDbg)
+		reqs = extractRequestData (self.request, interested, self.dbg)
 		for (key, val) in reqs.iteritems():
+			self.dbg (key, "=", val)
 			setattr (actobj, key, val)
 		#Will read data from postdata, and update the pass-in actobj.
 		pass
