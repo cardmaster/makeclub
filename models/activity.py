@@ -36,11 +36,12 @@ class Activity(db.Model):
 	club = db.ReferenceProperty(Club, required = True)
 	startTime = db.DateTimeProperty(indexed=True, auto_now=True, required=True)
 	duration = db.FloatProperty(required = True) #Unit is hours
-	expense = MoneyProperty()
+	expense = MoneyProperty(default=Decimal(0))
 	bill = BillProperty()
 	isBilled = db.BooleanProperty(default=False)
 	def __init__(self, *args, **kw):
 		super(Activity, self).__init__(*args, **kw)
+		self.expenseBackup = self.expense
 		self.expense = self.calcExpense()
 	
 	def calcExpense(self):
@@ -53,6 +54,9 @@ class Activity(db.Model):
 		
 	def put(self):
 		self.expense = self.calcExpense()
+		moneychg = self.expense - self.expenseBackup
+		self.club.fund -= moneychg #When create an activity, will use the club fund, 
+		self.club.put()            #And after send bill, those money will be pay by confiredm participators
 		return db.Model.put (self)
 	@staticmethod
 	def createDefault(user, club):
@@ -104,6 +108,7 @@ class ActivityBill(db.Model):
 	activity = db.ReferenceProperty(Activity, required=True)
 	expenseBill = BillProperty(required = True) #e.g., court fee, 100, balls fee 70
 	memberBill = BillProperty(required = True) #e.g., leaf, 100, wangyang, 200
+	sum = MoneyProperty(default=Decimal(0))
 	isExecuted = db.BooleanProperty(default=False)
 	createTime = db.DateTimeProperty(auto_now=True, required=True)
 	operator = db.UserProperty(required = True, auto_current_user=True)
@@ -126,6 +131,9 @@ class ActivityBill(db.Model):
 				actp = ActivityParticipator.between(mem, self.activity)
 				actp.expense = 0
 				actp.put()
+		club = self.activity.club
+		club.fund -= self.sum #When cancel, not effect
+		club.put()	
 	def put(self):
 		if (not self.isExecuted):
 			self.execute()
@@ -148,7 +156,9 @@ class ActivityBill(db.Model):
 			actp = ActivityParticipator.between(mem, self.activity)
 			actp.expense = cost
 			actp.put()
-			
+		club = self.activity.club
+		club.fund += self.sum #When do bill, member's money will go to club's fund
+		club.put()			
 	@staticmethod
 	def getBill(actobj):
 		aq = ActivityBill.all()
@@ -176,6 +186,7 @@ class ActivityBill(db.Model):
 			tup = (person.member.user.email(), duration)
 			tuplist.append(tup)
 			sumdur += duration
+		summoney = Decimal(0)
 		mb = list()
 		for tup in tuplist:
 			email = tup[0]
@@ -183,7 +194,8 @@ class ActivityBill(db.Model):
 			rate = duration / sumdur
 			mExp = rate * float(expense)
 			mDecExp = Decimal(mExp)
+			summoney += mDecExp
 			tup = (email, mDecExp)
 			mb.append(tup)
-		bill = ActivityBill(activity = actobj, expenseBill = actobj.bill, memberBill = mb)
+		bill = ActivityBill(activity = actobj, expenseBill = actobj.bill, memberBill = mb, sum=summoney)
 		return bill
