@@ -19,7 +19,7 @@
  
 '''
 from google.appengine.api import users
-from models import Club, conf, Membership, ActivityParticipator
+from models import Club, conf, Membership, ActivityParticipator, ActivityBill
 
 operations = [
 	"listClubs",
@@ -47,6 +47,7 @@ actOperatoins = [
 	"join",
 	"confirm",
 	"bill",
+	"rebill",
 	"quit"
 ]
 class AccessUser(object):
@@ -143,8 +144,13 @@ class ActivityUser(AccessUser):
 		if (parti):
 			return not parti.confirmed
 		return False
+	def can_bill(self, *args):
+		if (self.act.isBilled):
+			return self.can("rebill", *args)
+		else:
+			return self.defaultChecker(*args)
 	def defaultChecker(self, *args):
-		organizerOnly = ["edit", "confirm", "bill"]
+		organizerOnly = ["edit", "confirm", "bill", "rebill"]
 		selfOnly = ["confirm"]
 		memberOnly = ["view", "join"]
 		target = None

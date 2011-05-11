@@ -23,7 +23,7 @@ from google.appengine.ext import db
 from errors import errorPage
 from infopage import infoPage
 from access import hasActPrivilige, hasClubPrivilige
-from models import Activity, Membership, Club, ActivityParticipator
+from models import Activity, Membership, Club, ActivityParticipator, ActivityBill
 from url import urldict
 from template import render
 
@@ -59,6 +59,9 @@ class ActivityBase(webapp.RequestHandler):
 			errorPage ( 					self.response,  "Not authorrized",   					urldict['ClubView'].path(self.actobj.club.slug),   403)
 			return False
 		return True
+	def dbg(self, *args):
+		self.response.out.write (" ".join([str(arg) for arg in args]))
+		self.response.out.write ("<br />\n")
 			
 	def get(self, *args):
 		actobj = self.getActModel()
@@ -96,7 +99,12 @@ class ActivityView(ActivityBase):
 			sop = SpecialOp('edit', urldict['ActivityEdit'].path(aid), False)
 			specialOps.append(sop)
 		urlcfg = urldict['ActivityParticipate']
-		for oper in ('bill', 'join', 'quit', 'confirm'):
+		soplist = ['join', 'quit', 'confirm']
+		if (self.actobj.isBilled):
+			soplist.append("rebill")
+		else:
+			soplist.append("bill")
+		for oper in soplist:
 			if (hasActPrivilige(user, self.actobj, oper) ):
 				data = [('target', user.email()), ]
 				sop = SpecialOp(oper, urlcfg.path(aid, oper), True, data)
@@ -176,13 +184,21 @@ class ActivityParticipate(webapp.RequestHandler):
 				return infoPage (self.response, "Successfully Confirmed", "success confirmed %s join activity %s" % (mem.name, actobj.name), acturl)
 			else:
 				return errorPage ( self.response,  "No Such a Member",   acturl,   404)
-		elif (oper == 'bill'):
-			return errorPage ( self.response,  "Not Implemented",   acturl,   501)
+		elif (oper == 'bill' or oper == "rebill"):
+			billobj = ActivityBill.generateBill(actobj, oper == "rebill")#If in rebill operation, we could enable rebill
+			if (billobj):
+				billobj.put()
+				billDict = dict(billobj = billobj)
+				return infoPage (self.response, "Successfully Billded", str(billobj.memberBill), acturl)
+			else:
+				return errorPage (self.response, "Error Will Generate Bill", acturl, 501)
 
-def extractRequestData(request, interested):
+def extractRequestData(request, interested, dbg=None):
 	retval = dict()
 	for (key, valid) in interested.iteritems() :
 		val = valid (request.get(key))
+		if (dbg):
+			dbg ( "Extract:", key, "=", val)
 		if (val):
 			retval [key] = val
 	return retval
@@ -194,14 +210,18 @@ def parseDuration(times):
 	 print "Times String: ", tstr
 	 return float(tstr)
 	
-def parseBill (billstr):
+def parseBill (billstr, dbg = None):
 	entries = billstr.split (',')
 	ary = []
+	if (dbg):
+		dbg ("Bill String:", billstr)
+		dbg ("Splitted:", entries)
 	i = 1
 	for ent in entries:
+		ent = ent.strip()
 		if (i == 2):
 			val = ent
-			ary.push ( (key, val) )
+			ary.append ( (key, val) )
 			i = 0
 		else :
 			key = ent
@@ -215,10 +235,13 @@ class ActivityEdit(ActivityBase):
 		self.urlcfg = urldict['ActivityEdit']
 		self.actobj = None
 		self.actOperation = "edit"
+	def parseBillDbg(self, billstr):
+		return parseBill(billstr, self.dbg)
 	def updateObject(self, actobj):
-		interested = dict (name = str, intro = str, duration = parseDuration, bill = parseBill)
-		reqs = extractRequestData (self.request, interested)
+		interested = dict (name = str, intro = str, duration = parseDuration, bill = self.parseBillDbg)
+		reqs = extractRequestData (self.request, interested, self.dbg)
 		for (key, val) in reqs.iteritems():
+			self.dbg (key, "=", val)
 			setattr (actobj, key, val)
 		#Will read data from postdata, and update the pass-in actobj.
 		pass

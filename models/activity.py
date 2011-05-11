@@ -18,10 +18,12 @@
  
  
 '''
+from google.appengine.api import users
 from google.appengine.ext import db
 from properties import MoneyProperty, BillProperty
 from models import Club, Membership
-from decimal import Decimal
+from decimal import Decimal, getcontext
+from datetime import datetime
 
 """
 The reason we seperate date&time is mainly for index the data, so we could use more =
@@ -36,6 +38,7 @@ class Activity(db.Model):
 	duration = db.FloatProperty(required = True) #Unit is hours
 	expense = MoneyProperty()
 	bill = BillProperty()
+	isBilled = db.BooleanProperty(default=False)
 	def __init__(self, *args, **kw):
 		super(Activity, self).__init__(*args, **kw)
 		self.expense = self.calcExpense()
@@ -63,7 +66,8 @@ class Activity(db.Model):
 class ActivityParticipator(db.Model):
 	activity = db.ReferenceProperty(Activity, required=True)
 	member = db.ReferenceProperty(Membership, required=True)
-	expense = MoneyProperty(default = '0')
+	expense = MoneyProperty(default=Decimal(0))
+	duration = db.FloatProperty(default = -1.0) #Unit is hours
 	#Either Confirmed by Organizer or yourself, after confirmed, you cannot quit.
 	confirmed = db.BooleanProperty(default = False)
 	def __init__(self, *args, **kw):
@@ -82,6 +86,11 @@ class ActivityParticipator(db.Model):
 		q = ActivityParticipator.all()
 		q.filter('member = ', mem).filter('activity = ', act)
 		return q.get()
+	@staticmethod
+	def ofAct(act):
+		q = ActivityParticipator.all()
+		q.filter('activity = ', act)
+		return q
 	
 	def put(self):
 		oldms = Membership.between(self.member, self.activity)
@@ -90,3 +99,91 @@ class ActivityParticipator(db.Model):
 			oldms.copy(self)
 			entry = oldms
 		return db.Model.put (entry)
+	
+class ActivityBill(db.Model):
+	activity = db.ReferenceProperty(Activity, required=True)
+	expenseBill = BillProperty(required = True) #e.g., court fee, 100, balls fee 70
+	memberBill = BillProperty(required = True) #e.g., leaf, 100, wangyang, 200
+	isExecuted = db.BooleanProperty(default=False)
+	createTime = db.DateTimeProperty(auto_now=True, required=True)
+	operator = db.UserProperty(required = True, auto_current_user=True)
+	isCancelled = db.BooleanProperty(default=False)
+	cancelTime = db.DateTimeProperty()
+	def cancel(self):
+		if (self.isCancelled):
+			return True
+		self.activity.isBilled=False
+		self.activity.put()
+		self.cancelTime = datetime.now()
+		self.isCancelled = True
+		for tup in self.memberBill:
+			user = users.User(tup[0])
+			money = Decimal(tup[1])
+			mem = Membership.between(user, self.activity.club)
+			if (mem):
+				mem.balance = mem.balance + money
+				mem.put()
+				actp = ActivityParticipator.between(mem, self.activity)
+				actp.expense = 0
+				actp.put()
+	def put(self):
+		if (not self.isExecuted):
+			self.execute()
+		return super(ActivityBill, self).put()
+	#will casue member money decrease
+	def execute(self):
+		if (self.isExecuted):
+			return
+		self.isExecuted = True
+		self.activity.isBilled=True
+		self.activity.put()
+		for tup in self.memberBill:
+			email = tup[0]
+			cost = tup[1]
+			user = users.User(email)
+			mem = Membership.between(user, self.activity.club)
+			bal = mem.balance
+			mem.balance = bal - cost
+			mem.put()
+			actp = ActivityParticipator.between(mem, self.activity)
+			actp.expense = cost
+			actp.put()
+			
+	@staticmethod
+	def getBill(actobj):
+		aq = ActivityBill.all()
+		aq.filter("activity =", actobj)
+		return aq.get()
+	@staticmethod
+	def generateBill(actobj, allowRebill = False): #Generate a new bill object by given activity object
+		oldBill = ActivityBill.getBill(actobj)
+		if (not allowRebill and oldBill):
+			return None
+		if (oldBill):
+			oldBill.cancel()
+		cost = actobj.bill
+		expense = actobj.expense
+		actDur = actobj.duration
+		persons = ActivityParticipator.ofAct(actobj)
+		persons.filter("confirmed =", True)
+		sumdur = 0.0
+		tuplist = list()
+		for person in persons:
+			duration = person.duration
+			if (duration < 0 or duration > actDur):
+				duration = actDur
+			person.duration = duration
+			tup = (person.member.user.email(), duration)
+			tuplist.append(tup)
+			sumdur += duration
+		mb = list()
+		for tup in tuplist:
+			email = tup[0]
+			dur = tup[1]
+			rate = duration / sumdur
+			mExp = rate * float(expense)
+			mDecExp = Decimal(mExp)
+			tup = (email, mDecExp)
+			mb.append(tup)
+		bill = ActivityBill(activity = actobj, expenseBill = actobj.bill, memberBill = mb)
+		return bill
