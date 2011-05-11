@@ -99,7 +99,12 @@ class ActivityView(ActivityBase):
 			sop = SpecialOp('edit', urldict['ActivityEdit'].path(aid), False)
 			specialOps.append(sop)
 		urlcfg = urldict['ActivityParticipate']
-		for oper in ('bill', 'join', 'quit', 'confirm'):
+		soplist = ['join', 'quit', 'confirm']
+		if (self.actobj.isBilled):
+			soplist.append("rebill")
+		else:
+			soplist.append("bill")
+		for oper in soplist:
 			if (hasActPrivilige(user, self.actobj, oper) ):
 				data = [('target', user.email()), ]
 				sop = SpecialOp(oper, urlcfg.path(aid, oper), True, data)
@@ -179,10 +184,14 @@ class ActivityParticipate(webapp.RequestHandler):
 				return infoPage (self.response, "Successfully Confirmed", "success confirmed %s join activity %s" % (mem.name, actobj.name), acturl)
 			else:
 				return errorPage ( self.response,  "No Such a Member",   acturl,   404)
-		elif (oper == 'bill'):
-			billobj = ActivityBill.generateBill(actobj, True)
-			print billobj.memberBill
-			billobj.put()
+		elif (oper == 'bill' or oper == "rebill"):
+			billobj = ActivityBill.generateBill(actobj, oper == "rebill")#If in rebill operation, we could enable rebill
+			if (billobj):
+				billobj.put()
+				billDict = dict(billobj = billobj)
+				return infoPage (self.response, "Successfully Billded", str(billobj.memberBill), acturl)
+			else:
+				return errorPage (self.response, "Error Will Generate Bill", acturl, 501)
 
 def extractRequestData(request, interested, dbg=None):
 	retval = dict()

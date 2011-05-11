@@ -38,6 +38,7 @@ class Activity(db.Model):
 	duration = db.FloatProperty(required = True) #Unit is hours
 	expense = MoneyProperty()
 	bill = BillProperty()
+	isBilled = db.BooleanProperty(default=False)
 	def __init__(self, *args, **kw):
 		super(Activity, self).__init__(*args, **kw)
 		self.expense = self.calcExpense()
@@ -111,6 +112,8 @@ class ActivityBill(db.Model):
 	def cancel(self):
 		if (self.isCancelled):
 			return True
+		self.activity.isBilled=False
+		self.activity.put()
 		self.cancelTime = datetime.now()
 		self.isCancelled = True
 		for tup in self.memberBill:
@@ -132,6 +135,8 @@ class ActivityBill(db.Model):
 		if (self.isExecuted):
 			return
 		self.isExecuted = True
+		self.activity.isBilled=True
+		self.activity.put()
 		for tup in self.memberBill:
 			email = tup[0]
 			cost = tup[1]
